@@ -1,12 +1,12 @@
-name: game_sf_template
+name: phase
 version: 0.1.0
 
 authors:
   - Matt Swieboda <mswieboda@users.noreply.github.com>
 
 targets:
-  game_sf_template:
-    main: src/game_sf_template.cr
+  phase:
+    main: src/phase.cr
 
 dependencies:
   game_sf:

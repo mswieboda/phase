@@ -1,6 +1,6 @@
 require "./font"
 
-module GameSFTemplate
+module Phase
   class HUD
     getter text
 

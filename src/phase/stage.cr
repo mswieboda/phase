@@ -1,7 +1,7 @@
 require "./scene/start"
 require "./scene/main"
 
-module GameSFTemplate
+module Phase
   class Stage < GSF::Stage
     getter start
     getter main

@@ -1,8 +1,8 @@
 require "game_sf"
 
-require "./game_sf_template/game"
+require "./phase/game"
 
-module GameSFTemplate
+module Phase
   alias Keys = GSF::Keys
   alias Mouse = GSF::Mouse
   alias Joysticks = GSF::Joysticks

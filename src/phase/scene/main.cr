@@ -1,15 +1,15 @@
-require "../player"
+require "../ship"
 require "../hud"
 
-module GameSFTemplate::Scene
+module Phase::Scene
   class Main < GSF::Scene
     getter hud
-    getter player
+    getter ship
 
     def initialize
       super(:main)
 
-      @player = Player.new(x: 300, y: 300)
+      @ship = Ship.new(x: 300, y: 300)
       @hud = HUD.new
     end
 
@@ -19,12 +19,12 @@ module GameSFTemplate::Scene
         return
       end
 
-      player.update(frame_time, keys)
+      ship.update(frame_time, keys)
       hud.update(frame_time)
     end
 
     def draw(window)
-      player.draw(window)
+      ship.draw(window)
       hud.draw(window)
     end
   end
