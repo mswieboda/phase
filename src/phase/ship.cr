@@ -1,8 +1,11 @@
+require "./pulse"
+
 module Phase
   class Ship
     getter x : Float64
     getter y : Float64
     getter animations
+    getter pulse : Pulse
 
     Speed = 666
     Sheet = "./assets/ship.png"
@@ -21,6 +24,8 @@ module Phase
       idle.add(Sheet, 0, 0, size, size)
 
       @animations = GSF::Animations.new(:idle, idle)
+
+      @pulse = Pulse.new(x, y)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse)
@@ -28,6 +33,8 @@ module Phase
 
       update_movement(frame_time, keys)
       update_turret(frame_time, mouse)
+
+      pulse.update(frame_time, x, y)
     end
 
     def update_movement(frame_time, keys : Keys)
@@ -58,6 +65,7 @@ module Phase
 
     def draw(window : SF::RenderWindow)
       animations.draw(window, x, y)
+      pulse.draw(window)
     end
 
     def move(dx : Float64, dy : Float64)

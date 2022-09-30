@@ -13,7 +13,7 @@ module Phase::Scene
       @hud = HUD.new
     end
 
-    def update(frame_time, keys : Keys, mouse : Mouse)
+    def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
       if keys.just_pressed?(Keys::Escape)
         @exit = true
         return
