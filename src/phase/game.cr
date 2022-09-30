@@ -17,6 +17,8 @@ module Phase
 
       super(title: "phase", mode: mode, style: style)
 
+      window.framerate_limit = 69
+
       @stage = Stage.new(window)
     end
   end
