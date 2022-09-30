@@ -10,7 +10,7 @@ module Phase::Scene
       super(:main)
 
       @ship = Ship.new(x: 300, y: 300)
-      @hud = HUD.new
+      @hud = HUD.new(ship)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
