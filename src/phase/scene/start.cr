@@ -36,8 +36,7 @@ module Phase::Scene
 
       # TODO: refactor this to some just_pressed?(:action) etc pattern per scene
       #       with defined input config per scene
-      if keys.just_pressed?([Keys::Space, Keys::Enter]) ||
-         joysticks.just_pressed?([Joysticks::A, Joysticks::B, Joysticks::X, Joysticks::Y])
+      if keys.just_pressed?([Keys::Space, Keys::Enter])
         case items.focused
         when "start"
           @start_scene = :main

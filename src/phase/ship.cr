@@ -23,10 +23,11 @@ module Phase
       @animations = GSF::Animations.new(:idle, idle)
     end
 
-    def update(frame_time, keys : Keys)
+    def update(frame_time, keys : Keys, mouse : Mouse)
       animations.update(frame_time)
 
       update_movement(frame_time, keys)
+      update_turret(frame_time, mouse)
     end
 
     def update_movement(frame_time, keys : Keys)
@@ -49,6 +50,10 @@ module Phase
 
         move(dx, dy)
       end
+    end
+
+    def update_turret(frame_time, mouse : Mouse)
+      # TODO: rotate turret to the direction of the mouse (instantly)
     end
 
     def draw(window : SF::RenderWindow)
