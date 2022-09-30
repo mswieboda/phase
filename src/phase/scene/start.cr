@@ -1,7 +1,10 @@
 module Phase::Scene
   class Start < GSF::Scene
+    getter title : SF::Text
     getter start_scene : Symbol?
     getter items
+
+    TitleTextColor = SF::Color::Green
 
     def initialize
       super(:start)
@@ -9,8 +12,17 @@ module Phase::Scene
       @start_scene = nil
       @items = GSF::MenuItems.new(
         font: Font.default,
-        labels: ["start", "options", "exit"]
+        labels: ["start", "exit"],
+        size: 36
       )
+
+      @title = SF::Text.new("phase", Font.default, 60)
+      @title.fill_color = TitleTextColor
+
+      title_x = Screen.width / 2 - @title.global_bounds.width / 2
+      title_y = Screen.height / 4 - @title.global_bounds.height / 2
+
+      @title.position = {title_x, title_y}
     end
 
     def reset
@@ -38,6 +50,7 @@ module Phase::Scene
     end
 
     def draw(window : SF::RenderWindow)
+      window.draw(title)
       items.draw(window)
     end
   end
