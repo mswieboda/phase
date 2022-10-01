@@ -8,7 +8,7 @@ module Phase
     getter animations
     getter? remove
 
-    Speed = 3000
+    Speed = 1989
     Sheet = "./assets/laser.png"
     Width = 48
     Height = 16
