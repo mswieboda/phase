@@ -104,7 +104,7 @@ module Phase
       end
 
       update_movement(frame_time, keys)
-      update_cannon(frame_time, mouse)
+      update_cannon(frame_time, mouse, enemies)
       pulse.update(frame_time, x, y, enemies)
     end
 
@@ -132,10 +132,10 @@ module Phase
       end
     end
 
-    def update_cannon(frame_time, mouse : Mouse)
+    def update_cannon(frame_time, mouse : Mouse, enemies : Array(Enemy))
       cannon.update(frame_time, x, y, mouse.to_rotation(x, y))
       update_firing(mouse)
-      lasers.each(&.update(frame_time))
+      lasers.each(&.update(frame_time, enemies))
     end
 
     def update_firing(mouse)

@@ -24,10 +24,20 @@ module Phase
       @animations = GSF::Animations.new(:idle, idle)
     end
 
-    def update(frame_time)
+    def self.hit_radius
+      HitRadius
+    end
+
+    def hit_radius
+      self.class.hit_radius
+    end
+
+    def update(frame_time, enemies : Array(Enemy))
       animations.update(frame_time)
 
       update_movement(frame_time)
+
+      check_enemies(enemies)
     end
 
     def update_movement(frame_time)
@@ -40,6 +50,22 @@ module Phase
 
     def draw(window : SF::RenderWindow)
       animations.draw(window, x, y)
+    end
+
+    def hit_circles
+      [
+        Circle.new(x: x, y: y, radius: hit_radius)
+      ]
+    end
+
+    def hit?(circle : Circle)
+      hit_circles.any?(&.intersects?(circle))
+    end
+
+    def check_enemies(enemies : Array(Enemy))
+      enemies.each do |enemy|
+        enemy.hit! if hit?(enemy.hit_circle)
+      end
     end
   end
 end

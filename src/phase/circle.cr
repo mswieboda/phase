@@ -31,7 +31,7 @@ module Phase
 
       dist = Math.sqrt(center_dist_x * center_dist_x + center_dist_y * center_dist_y)
 
-      dist - circle.radius <= outer_radius
+      dist - circle.radius <= radius
     end
   end
 end
