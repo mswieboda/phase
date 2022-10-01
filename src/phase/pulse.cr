@@ -6,7 +6,7 @@ module Phase
     getter x : Float64
     getter y : Float64
     getter animations
-    getter timer : GSF::Timer
+    getter timer : Timer
     getter? firing
 
     Sheet = "./assets/pulse.png"
@@ -34,7 +34,7 @@ module Phase
 
       @animations = GSF::Animations.new(:pulse, pulse)
       @animations.play(:pulse)
-      @timer = GSF::Timer.new(Duration)
+      @timer = Timer.new(Duration)
       @firing = true
     end
 

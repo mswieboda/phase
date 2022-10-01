@@ -1,4 +1,5 @@
 require "./pulse"
+require "./laser"
 
 module Phase
   class Ship
@@ -17,12 +18,15 @@ module Phase
     getter animations
     getter pulse : Pulse
     getter thrusters : ThrusterAnimationsTuple
+    getter fire_timer : Timer
+    getter lasers : Array(Laser)
 
     Speed = 666
     Sheet = "./assets/ship.png"
     ShipSize = 128
     ThrusterSheet = "./assets/thruster.png"
     ThrusterSize = 32
+    FireDuration = 150.milliseconds
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -76,6 +80,9 @@ module Phase
           right: GSF::Animations.new(:move, move_right),
         }
       }
+
+      @fire_timer = Timer.new(FireDuration)
+      @lasers = [] of Laser
     end
 
     def self.size
@@ -125,6 +132,28 @@ module Phase
 
     def update_turret(frame_time, mouse : Mouse)
       # TODO: rotate turret to the direction of the mouse (instantly)
+
+      update_firing(mouse)
+
+      lasers.each(&.update(frame_time))
+    end
+
+    def update_firing(mouse)
+      if mouse.pressed?(Mouse::Left)
+        if fire_timer.started?
+          if fire_timer.done?
+            fire(mouse)
+
+            fire_timer.restart
+          end
+        else
+          fire_timer.start
+
+          fire(mouse)
+        end
+      else
+        fire_timer.stop
+      end
     end
 
     def draw(window : SF::RenderWindow)
@@ -151,6 +180,14 @@ module Phase
       end
 
       pulse.draw(window)
+      lasers.each(&.draw(window))
+    end
+
+    def fire(mouse : Mouse)
+      # TODO: determine rotation from x,y to mouse.x, mouse,y
+      rotation = 0
+
+      @lasers << Laser.new(x, y, rotation)
     end
 
     def play_thruster(dir : Symbol)
