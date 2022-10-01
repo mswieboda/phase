@@ -11,6 +11,8 @@ module Phase
     end
 
     def intersects?(box : Box)
+      return intersects_rotated?(box) if box.rotated?
+
       dist_x = (x - box.x - box.width / 2).abs
       dist_y = (y - box.y - box.height / 2).abs
 
@@ -23,6 +25,37 @@ module Phase
       dy = dist_y - box.height / 2
 
       dx * dx + dy * dy <= radius * radius
+    end
+
+    def intersects_rotated?(box : Box)
+      # rotate circle back from box's angle
+      theta = -box.rotation * Math::PI / 180
+      cx = Math.cos(theta) * (x - box.origin_x) - Math.sin(theta) * (y - box.origin_y) + box.origin_x
+      cy = Math.sin(theta) * (x - box.origin_x) + Math.cos(theta) * (y - box.origin_y) + box.origin_y
+      circle = Circle.new(cx, cy, radius)
+
+      # find closest point in the box to the center of the (backwards rotated) circle
+      closest_x = circle.x
+      closest_y = circle.y
+
+      if circle.x < box.x
+        closest_x = box.x
+      elsif circle.x > box.x + box.width
+        closest_x = box.x + box.width
+      end
+
+      if circle.y < box.y
+        closest_y = box.y
+      elsif circle.y > box.y + box.height
+        closest_y = box.y + box.height
+      end
+
+      # determine collision
+      dx = closest_x - circle.x
+      dy = closest_y - circle.y
+      distance = Math.sqrt(dx * dx + dy * dy)
+
+      distance < radius
     end
 
     def intersects?(circle : Circle)

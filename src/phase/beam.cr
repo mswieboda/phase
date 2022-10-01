@@ -69,8 +69,10 @@ module Phase
     end
 
     def hit?(circle : Circle) : Bool
-      # TODO: detect collision with rotated box and circle
-      false
+      x = sprite.position.x
+      y = sprite.position.y - SegmentHeight / 2
+      box = Box.new(x, y, distance, SegmentHeight, rotation, sprite.position.x, sprite.position.y)
+      circle.intersects?(box)
     end
 
     def move(x, y, rotation)
