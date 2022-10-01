@@ -102,7 +102,6 @@ module Phase
 
       update_movement(frame_time, keys)
       update_turret(frame_time, mouse)
-
       pulse.update(frame_time, x, y, enemies)
     end
 
@@ -131,8 +130,6 @@ module Phase
     end
 
     def update_turret(frame_time, mouse : Mouse)
-      # TODO: rotate turret to the direction of the mouse (instantly)
-
       update_firing(mouse)
 
       lasers.each(&.update(frame_time))
@@ -184,9 +181,9 @@ module Phase
     end
 
     def fire(mouse : Mouse)
-      # TODO: determine rotation from x,y to mouse.x, mouse,y
-      rotation = 0
+      rotation = mouse.to_rotation(x, y)
 
+      # TODO: place x, y inside the start or middle of the turret
       @lasers << Laser.new(x, y, rotation)
     end
 
