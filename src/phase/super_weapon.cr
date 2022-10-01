@@ -3,9 +3,11 @@ require "./arc"
 
 module Phase
   abstract class SuperWeapon
+    getter name
     getter? firing
 
-    def initialize
+    def initialize(name = "")
+      @name = name
       @firing = false
     end
 
