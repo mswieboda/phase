@@ -120,16 +120,17 @@ module Phase
 
       reset_thrusters
 
-      if y + dy > 0 && x + dy > 0
-        if dx != 0 && dy != 0
-          # 45 deg, from sqrt(x^2 + y^2) at 45 deg
-          const = 0.70710678118_f64
-          dx *= const
-          dy *= const
-        end
-
-        move(dx, dy)
+      if dx != 0 && dy != 0
+        # 45 deg, from sqrt(x^2 + y^2) at 45 deg
+        const = 0.70710678118_f64
+        dx *= const
+        dy *= const
       end
+
+      dx = 0_f64 if x + dx < 0
+      dy = 0_f64 if y + dy < 0
+
+      move(dx, dy) if dx != 0_f64 || dy != 0_f64
     end
 
     def update_cannon(frame_time, mouse : Mouse, enemies : Array(Enemy))
