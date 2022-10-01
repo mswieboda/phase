@@ -12,14 +12,14 @@ module Phase
     def initialize(ship : Ship)
       @ship = ship
 
-      @text = SF::Text.new("phase pulse:", Font.default, 24)
+      @text = SF::Text.new("", Font.default, 24)
       @text.fill_color = TextColor
       @text.position = {Margin, Margin}
     end
 
     def update(frame_time)
-      percent = (ship.pulse.timer.percent * 100).to_i
-      @text.string = "phase pulse: #{percent}%"
+      percent = (ship.super_weapon_timer.percent * 100).to_i
+      @text.string = "super weapon: #{percent}%"
     end
 
     def draw(window : SF::RenderWindow)

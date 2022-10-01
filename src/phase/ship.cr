@@ -1,6 +1,8 @@
 require "./pulse"
 require "./laser"
 require "./cannon"
+require "./super_weapon"
+require "./super_cannon"
 
 module Phase
   class Ship
@@ -22,6 +24,10 @@ module Phase
     getter fire_timer : Timer
     getter lasers : Array(Laser)
     getter cannon : Cannon
+    getter super_weapon : SuperWeapon
+    getter super_weapons : Array(SuperWeapon)
+    getter super_cannon : SuperCannon
+    getter super_weapon_timer : Timer
 
     Speed = 666
     Sheet = "./assets/ship.png"
@@ -29,11 +35,18 @@ module Phase
     ThrusterSheet = "./assets/thruster.png"
     ThrusterSize = 64
     FireDuration = 150.milliseconds
+    SuperWeaponDuration = 10.seconds
 
     def initialize(x = 0, y = 0)
       @x = x
       @y = y
       @pulse = Pulse.new(x, y)
+      @super_cannon = SuperCannon.new(x, y)
+      @super_weapons = [] of SuperWeapon
+      @super_weapons << @pulse
+      @super_weapons << @super_cannon
+      @super_weapon = @super_cannon
+      @super_weapon_timer = Timer.new(SuperWeaponDuration)
 
       fps = 60
 
@@ -105,7 +118,7 @@ module Phase
 
       update_movement(frame_time, keys)
       update_cannon(frame_time, mouse, enemies)
-      pulse.update(frame_time, x, y, enemies)
+      update_super_weapon(frame_time, mouse, enemies)
     end
 
     def update_movement(frame_time, keys : Keys)
@@ -139,6 +152,18 @@ module Phase
       lasers.each(&.update(frame_time, enemies))
       lasers.select(&.remove?).each do |laser|
         lasers.delete(laser)
+      end
+    end
+
+    def update_super_weapon(frame_time, mouse : Mouse, enemies : Array(Enemy))
+      if super_weapon == pulse
+        pulse.update(frame_time, super_weapon_timer.done?, x, y, enemies)
+      elsif super_weapon == super_cannon
+        super_cannon.update(frame_time, super_weapon_timer.done?, x, y, mouse.to_rotation(x, y), enemies)
+      end
+
+      if !super_weapon_timer.started? || super_weapon_timer.done?
+        super_weapon_timer.restart
       end
     end
 
@@ -183,8 +208,8 @@ module Phase
         end
       end
 
-      pulse.draw(window)
       lasers.each(&.draw(window))
+      super_weapon.draw(window)
       cannon.draw(window)
     end
 

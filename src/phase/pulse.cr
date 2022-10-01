@@ -1,13 +1,12 @@
+require "./super_weapon"
 require "./box"
 require "./arc"
 
 module Phase
-  class Pulse
+  class Pulse < SuperWeapon
     getter x : Float64
     getter y : Float64
     getter animations
-    getter timer : Timer
-    getter? firing
 
     Sheet = "./assets/pulse.png"
     Duration = 10.seconds
@@ -18,6 +17,8 @@ module Phase
     Damage = 10
 
     def initialize(x = 0, y = 0)
+      super()
+
       @x = x
       @y = y
 
@@ -35,40 +36,32 @@ module Phase
 
       @animations = GSF::Animations.new(:pulse, pulse)
       @animations.play(:pulse)
-      @timer = Timer.new(Duration)
-      @firing = true
     end
 
-    def update(frame_time, x : Float64, y : Float64, enemies : Array(Enemy))
+    def update(frame_time, timer_done : Bool, x : Float64, y : Float64, enemies : Array(Enemy))
       move(x, y) unless firing?
 
       animations.update(frame_time)
 
-      update_pulse(frame_time, enemies)
-    end
-
-    def update_pulse(frame_time, enemies : Array(Enemy))
       @firing = false if firing? && animations.done?
 
-      if timer.done?
-        timer.restart
-
+      if timer_done
         animations.play(:pulse)
         @firing = true
-      else
-        timer.start unless timer.started?
       end
 
-      enemies.each do |enemy|
-        enemy.hit(Damage) if hit?(enemy.hit_circle)
+      if firing?
+        enemies.each do |enemy|
+          enemy.hit(Damage) if hit?(enemy.hit_circle)
+        end
       end
     end
 
     def draw(window : SF::RenderWindow)
-      if firing?
-        animations.draw(window, x, y) if firing?
-        draw_hit_arc(window)
-      end
+      return unless firing?
+
+      animations.draw(window, x, y)
+      draw_hit_arc(window)
     end
 
     def draw_hit_arc(window : SF::RenderWindow)
@@ -112,9 +105,7 @@ module Phase
       Arc.new(x, y, radii[:inner], radii[:outer])
     end
 
-    def hit?(circle : Circle)
-      return false unless firing?
-
+    def hit?(circle : Circle) : Bool
       hit_arc.intersects?(circle)
     end
   end
