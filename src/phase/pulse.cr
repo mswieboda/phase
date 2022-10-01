@@ -13,7 +13,7 @@ module Phase
     Duration = 1.seconds
 
     OuterRadii = [64, 128, 192, 256, 320, 320, 320]
-    InnerRadii = [0, 32, 64, 96, 128, 128, 128]
+    InnerRadii = [0, 32, 64, 128, 192, 256, 288]
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -24,16 +24,12 @@ module Phase
 
       # fire
       pulse_size = 640
-      pulse_frames = 5
+      pulse_frames = 7
       pulse = GSF::Animation.new((fps / 10).to_i, loops: false)
 
       pulse_frames.times do |index|
         pulse.add(Sheet, index * pulse_size, 0, pulse_size, pulse_size)
       end
-
-      # add in extra frames at end
-      pulse.add(Sheet, 4 * pulse_size, 0, pulse_size, pulse_size)
-      pulse.add(Sheet, 4 * pulse_size, 0, pulse_size, pulse_size)
 
       @animations = GSF::Animations.new(:pulse, pulse)
       @animations.play(:pulse)
