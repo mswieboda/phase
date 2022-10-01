@@ -10,7 +10,7 @@ module Phase
     getter? firing
 
     Sheet = "./assets/pulse.png"
-    Duration = 1.seconds
+    Duration = 10.seconds
 
     OuterRadii = [64, 128, 192, 256, 320, 320, 320]
     InnerRadii = [0, 32, 64, 128, 192, 256, 288]
