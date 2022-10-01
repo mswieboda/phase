@@ -1,3 +1,5 @@
+require "./circle"
+
 module Phase
   class Enemy
     getter x : Float64
@@ -7,7 +9,9 @@ module Phase
 
     Sheet = "./assets/enemy.png"
     Size = 128
+    HitRadius = 64
     HitColor = SF::Color::Red
+    DebugHitBox = false
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -33,8 +37,16 @@ module Phase
       self.class.size
     end
 
-    def hit_box
-      Box.new(x: x - size / 2, y: y - size / 2, width: size, height: size)
+    def self.hit_radius
+      HitRadius
+    end
+
+    def hit_radius
+      self.class.hit_radius
+    end
+
+    def hit_circle
+      Circle.new(x: x, y: y, radius: hit_radius)
     end
 
     def hit!
@@ -48,6 +60,21 @@ module Phase
 
     def draw(window : SF::RenderWindow)
       animations.draw(window, x, y, color: hit? ? HitColor : SF::Color::White)
+      draw_hit_circle(window)
+    end
+
+    def draw_hit_circle(window : SF::RenderWindow)
+      return unless DebugHitBox
+
+      hc = hit_circle
+      circle = SF::CircleShape.new(hc.radius)
+      circle.fill_color = SF.color(0, 0, 0, 0)
+      circle.outline_thickness = 2
+      circle.outline_color = SF.color(250, 150, 100)
+      circle.origin = {hc.radius, hc.radius}
+      circle.position = {hc.x, hc.y}
+
+      window.draw(circle)
     end
 
     def move(dx : Float64, dy : Float64)

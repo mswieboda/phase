@@ -13,7 +13,7 @@ module Phase
     end
 
     # TODO: doesn't account for inner_radius
-    #       currently just intersection of circle with outer_radius
+    #       currently just intersection of outer circle
     def intersects?(box : Box)
       dist_x = (x - box.x - box.width / 2).abs
       dist_y = (y - box.y - box.height / 2).abs
@@ -26,7 +26,25 @@ module Phase
       dx = dist_x - box.width / 2
       dy = dist_y - box.height / 2
 
-      dx * dx + dy * dy <= outer_radius * outer_radius
+      return false unless dx * dx + dy * dy <= outer_radius * outer_radius
+
+      # TODO: check if it's entirely outside of the inner circle
+      true
+
+      # TODO: check to make sure all points are outside the inner circle
+      #       check the distance from circle center to point, is >= inner radius
+    end
+
+    def intersects?(circle : Circle)
+      center_dist_x = x - circle.x
+      center_dist_y = y - circle.y
+
+      dist = Math.sqrt(center_dist_x * center_dist_x + center_dist_y * center_dist_y)
+
+      return false if dist - circle.radius > outer_radius
+
+      # entirely inside the inner circle (bordering edge is not inside)
+      dist + circle.radius >= inner_radius
     end
   end
 end

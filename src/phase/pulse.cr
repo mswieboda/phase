@@ -10,10 +10,11 @@ module Phase
     getter? firing
 
     Sheet = "./assets/pulse.png"
-    Duration = 10.seconds
+    Duration = 1.seconds
 
     OuterRadii = [64, 128, 192, 256, 320, 320, 320]
-    InnerRadii = [0, 32, 64, 128, 192, 256, 288]
+    InnerRadii = [0, 64, 128, 192, 256, 288, 304]
+    DebugHitBox = false
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -58,17 +59,43 @@ module Phase
       end
 
       enemies.each do |enemy|
-        enemy.hit! if hit?(enemy.hit_box)
+        enemy.hit! if hit?(enemy.hit_circle)
       end
     end
 
     def draw(window : SF::RenderWindow)
-      animations.draw(window, x, y) if firing?
+      if firing?
+        animations.draw(window, x, y) if firing?
+        draw_hit_arc(window)
+      end
     end
 
-    def move(dx : Float64, dy : Float64)
-      @x = dx
-      @y = dy
+    def draw_hit_arc(window : SF::RenderWindow)
+      return unless DebugHitBox
+
+      ha = hit_arc
+
+      inner = SF::CircleShape.new(ha.inner_radius)
+      inner.fill_color = SF.color(0, 0, 0, 0)
+      inner.outline_thickness = 2
+      inner.outline_color = SF.color(250, 150, 100)
+      inner.origin = {ha.inner_radius, ha.inner_radius}
+      inner.position = {ha.x, ha.y}
+
+      outer = SF::CircleShape.new(ha.outer_radius)
+      outer.fill_color = SF.color(0, 0, 0, 0)
+      outer.outline_thickness = 2
+      outer.outline_color = SF.color(250, 150, 100)
+      outer.origin = {ha.outer_radius, ha.outer_radius}
+      outer.position = {ha.x, ha.y}
+
+      window.draw(inner)
+      window.draw(outer)
+    end
+
+    def move(x : Float64, y : Float64)
+      @x = x
+      @y = y
     end
 
     def radii
@@ -84,10 +111,10 @@ module Phase
       Arc.new(x, y, radii[:inner], radii[:outer])
     end
 
-    def hit?(box : Box)
+    def hit?(circle : Circle)
       return false unless firing?
 
-      hit_arc.intersects?(box)
+      hit_arc.intersects?(circle)
     end
   end
 end

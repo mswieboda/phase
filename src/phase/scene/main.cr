@@ -39,8 +39,8 @@ module Phase::Scene
     end
 
     def draw(window)
-      ship.draw(window)
       enemies.each(&.draw(window))
+      ship.draw(window)
       hud.draw(window)
     end
   end
