@@ -27,13 +27,13 @@ module Phase
       @pulse = Pulse.new(x, y)
     end
 
-    def update(frame_time, keys : Keys, mouse : Mouse)
+    def update(frame_time, keys : Keys, mouse : Mouse, enemies : Array(Enemy))
       animations.update(frame_time)
 
       update_movement(frame_time, keys)
       update_turret(frame_time, mouse)
 
-      pulse.update(frame_time, x, y)
+      pulse.update(frame_time, x, y, enemies)
     end
 
     def update_movement(frame_time, keys : Keys)

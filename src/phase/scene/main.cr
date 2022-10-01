@@ -18,7 +18,8 @@ module Phase::Scene
       [
         {x: 500, y: 700},
         {x: 300, y: 900},
-        {x: 900, y: 100}
+        {x: 900, y: 100},
+        {x: 1500, y: 1500}
       ].each do |coords|
         @enemies << Enemy.new(x: coords[:x], y: coords[:y])
       end
@@ -30,9 +31,9 @@ module Phase::Scene
         return
       end
 
-      ship.update(frame_time, keys, mouse)
-
       enemies.each(&.update(frame_time))
+
+      ship.update(frame_time, keys, mouse, enemies)
 
       hud.update(frame_time)
     end

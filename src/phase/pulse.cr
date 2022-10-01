@@ -1,3 +1,6 @@
+require "./box"
+require "./arc"
+
 module Phase
   class Pulse
     getter x : Float64
@@ -7,9 +10,10 @@ module Phase
     getter? firing
 
     Sheet = "./assets/pulse.png"
-    Duration = 10.seconds
+    Duration = 1.seconds
 
-    Sizes = [128, 256, 384, 512, 640]
+    OuterRadii = [64, 128, 192, 256, 320, 320, 320]
+    InnerRadii = [0, 32, 64, 96, 128, 128, 128]
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -37,15 +41,15 @@ module Phase
       @firing = true
     end
 
-    def update(frame_time, x : Float64, y : Float64)
+    def update(frame_time, x : Float64, y : Float64, enemies : Array(Enemy))
       move(x, y)
 
       animations.update(frame_time)
 
-      update_pulse(frame_time)
+      update_pulse(frame_time, enemies)
     end
 
-    def update_pulse(frame_time)
+    def update_pulse(frame_time, enemies : Array(Enemy))
       @firing = false if firing? && animations.done?
 
       if timer.done?
@@ -56,6 +60,10 @@ module Phase
       else
         timer.start unless timer.started?
       end
+
+      enemies.each do |enemy|
+        enemy.hit! if hit?(enemy.hit_box)
+      end
     end
 
     def draw(window : SF::RenderWindow)
@@ -65,6 +73,25 @@ module Phase
     def move(dx : Float64, dy : Float64)
       @x = dx
       @y = dy
+    end
+
+    def radii
+      display_frame = animations.display_frame
+
+      {
+        outer: OuterRadii[display_frame],
+        inner: InnerRadii[display_frame]
+      }
+    end
+
+    def hit_arc
+      Arc.new(x, y, radii[:inner], radii[:outer])
+    end
+
+    def hit?(box : Box)
+      return false unless firing?
+
+      hit_arc.intersects?(box)
     end
   end
 end
