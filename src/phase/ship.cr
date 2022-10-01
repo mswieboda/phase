@@ -1,5 +1,6 @@
 require "./pulse"
 require "./laser"
+require "./cannon"
 
 module Phase
   class Ship
@@ -20,6 +21,7 @@ module Phase
     getter thrusters : ThrusterAnimationsTuple
     getter fire_timer : Timer
     getter lasers : Array(Laser)
+    getter cannon : Cannon
 
     Speed = 666
     Sheet = "./assets/ship.png"
@@ -83,6 +85,7 @@ module Phase
 
       @fire_timer = Timer.new(FireDuration)
       @lasers = [] of Laser
+      @cannon = Cannon.new(x, y)
     end
 
     def self.size
@@ -101,7 +104,7 @@ module Phase
       end
 
       update_movement(frame_time, keys)
-      update_turret(frame_time, mouse)
+      update_cannon(frame_time, mouse)
       pulse.update(frame_time, x, y, enemies)
     end
 
@@ -129,9 +132,9 @@ module Phase
       end
     end
 
-    def update_turret(frame_time, mouse : Mouse)
+    def update_cannon(frame_time, mouse : Mouse)
+      cannon.update(frame_time, x, y, mouse.to_rotation(x, y))
       update_firing(mouse)
-
       lasers.each(&.update(frame_time))
     end
 
@@ -178,12 +181,13 @@ module Phase
 
       pulse.draw(window)
       lasers.each(&.draw(window))
+      cannon.draw(window)
     end
 
     def fire(mouse : Mouse)
       rotation = mouse.to_rotation(x, y)
 
-      # TODO: place x, y inside the start or middle of the turret
+      # TODO: place x, y inside the start or middle of the cannon
       @lasers << Laser.new(x, y, rotation)
     end
 
