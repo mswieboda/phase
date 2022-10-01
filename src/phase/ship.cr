@@ -42,7 +42,7 @@ module Phase
       # thruster animations
       move_size = ThrusterSize
       move_frames = 8
-      move_factor = 30
+      move_factor = 20
       move_top = GSF::Animation.new((fps / move_factor).to_i, loops: false)
 
       move_frames.times do |index|
