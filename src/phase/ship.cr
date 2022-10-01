@@ -45,7 +45,7 @@ module Phase
       @super_weapons = [] of SuperWeapon
       @super_weapons << @pulse
       @super_weapons << @super_cannon
-      @super_weapon = @super_cannon
+      @super_weapon = @super_weapons.first
       @super_weapon_timer = Timer.new(SuperWeaponDuration)
 
       fps = 60
@@ -118,7 +118,7 @@ module Phase
 
       update_movement(frame_time, keys)
       update_cannon(frame_time, mouse, enemies)
-      update_super_weapon(frame_time, mouse, enemies)
+      update_super_weapon(frame_time, keys, mouse, enemies)
     end
 
     def update_movement(frame_time, keys : Keys)
@@ -155,15 +155,36 @@ module Phase
       end
     end
 
-    def update_super_weapon(frame_time, mouse : Mouse, enemies : Array(Enemy))
-      if super_weapon == pulse
-        pulse.update(frame_time, super_weapon_timer.done?, x, y, enemies)
-      elsif super_weapon == super_cannon
-        super_cannon.update(frame_time, super_weapon_timer.done?, x, y, mouse.to_rotation(x, y), enemies)
-      end
+    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, enemies : Array(Enemy))
+      pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, enemies)
+      super_cannon.update(frame_time, super_weapon == super_cannon, super_weapon_timer.done?, x, y, mouse.to_rotation(x, y), enemies)
 
       if !super_weapon_timer.started? || super_weapon_timer.done?
         super_weapon_timer.restart
+      end
+
+      if keys.just_pressed?(Keys::Q)
+        prev_super_weapon
+      elsif keys.just_pressed?(Keys::E)
+        next_super_weapon
+      end
+    end
+
+    def prev_super_weapon
+      if index = super_weapons.index(super_weapon)
+        index -= 1
+        index = super_weapons.size - 1 if index < 0
+
+        @super_weapon = super_weapons[index]
+      end
+    end
+
+    def next_super_weapon
+      if index = super_weapons.index(super_weapon)
+        index += 1
+        index = 0 if index > super_weapons.size - 1
+
+        @super_weapon = super_weapons[index]
       end
     end
 
@@ -209,7 +230,7 @@ module Phase
       end
 
       lasers.each(&.draw(window))
-      super_weapon.draw(window)
+      super_weapons.each(&.draw(window))
       cannon.draw(window)
     end
 

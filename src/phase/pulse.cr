@@ -17,7 +17,7 @@ module Phase
     Damage = 10
 
     def initialize(x = 0, y = 0)
-      super()
+      super("pulse")
 
       @x = x
       @y = y
@@ -38,14 +38,14 @@ module Phase
       @animations.play(:pulse)
     end
 
-    def update(frame_time, timer_done : Bool, x : Float64, y : Float64, enemies : Array(Enemy))
+    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, enemies : Array(Enemy))
       move(x, y) unless firing?
 
       animations.update(frame_time)
 
       @firing = false if firing? && animations.done?
 
-      if timer_done
+      if current && timer_done
         animations.play(:pulse)
         @firing = true
       end

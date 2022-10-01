@@ -21,7 +21,7 @@ module Phase
     delegate rotation, to: sprite
 
     def initialize(x = 0, y = 0, rotation = 0_f64)
-      super()
+      super("laser")
 
       @distance = MaxDistance # TODO: start at 0_f64 and grow to MaxDistance quickly using another timer?
       @duration_timer = Timer.new(Duration)
@@ -43,12 +43,12 @@ module Phase
       @sprite_tip.rotation = rotation
     end
 
-    def update(frame_time, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, enemies : Array(Enemy))
+    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, enemies : Array(Enemy))
       move(x, y, rotation)
 
       @firing = false if firing? && duration_timer.done?
 
-      if timer_done
+      if current && timer_done
         duration_timer.restart
 
         @firing = true
