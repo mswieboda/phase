@@ -3,11 +3,9 @@ module Phase
     getter x : Float64
     getter y : Float64
     getter rotation : Float64
-    getter dx : Float64
-    getter dy : Float64
     getter animations
 
-    Speed = 10
+    Speed = 3000
     Sheet = "./assets/laser.png"
     Width = 48
     Height = 16
@@ -17,13 +15,6 @@ module Phase
       @x = x
       @y = y
       @rotation = rotation
-
-      speed = Speed
-      theta = rotation * Math::PI / 180
-      @dx = speed * Math.cos(theta)
-      @dy = speed * Math.sin(theta)
-
-      puts ">>> Laser rotation: #{rotation} (dx, dy): (#{@dx}, #{@dy})"
 
       # animations
       fps = 60
@@ -40,6 +31,11 @@ module Phase
     end
 
     def update_movement(frame_time)
+      speed = Speed * frame_time
+      theta = rotation * Math::PI / 180
+      dx = speed * Math.cos(theta)
+      dy = speed * Math.sin(theta)
+
       @x += dx
       @y += dy
     end
