@@ -19,6 +19,9 @@ module Phase
 
       window.framerate_limit = 69
 
+      puts ">>> SF::VideoMode.fullscreen_modes:"
+      puts ">>> #{SF::VideoMode.fullscreen_modes}"
+
       @stage = Stage.new(window)
     end
   end
