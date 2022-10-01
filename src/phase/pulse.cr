@@ -15,6 +15,7 @@ module Phase
     OuterRadii = [64, 128, 192, 256, 320, 320, 320]
     InnerRadii = [0, 64, 128, 192, 256, 288, 304]
     DebugHitBox = false
+    Damage = 10
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -59,7 +60,7 @@ module Phase
       end
 
       enemies.each do |enemy|
-        enemy.hit! if hit?(enemy.hit_circle)
+        enemy.hit(Damage) if hit?(enemy.hit_circle)
       end
     end
 

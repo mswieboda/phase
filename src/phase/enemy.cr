@@ -6,16 +6,21 @@ module Phase
     getter y : Float64
     getter animations
     getter? hit
+    getter health
+    getter? remove
 
     Sheet = "./assets/enemy.png"
     Size = 128
     HitRadius = 64
     HitColor = SF::Color::Red
     DebugHitBox = false
+    MaxHealth = 100
 
     def initialize(x = 0, y = 0, sheet = Sheet)
       @x = x
       @y = y
+      @health = MaxHealth
+      @remove = false
 
       # init animations
       fps = 60
@@ -49,8 +54,16 @@ module Phase
       Circle.new(x: x, y: y, radius: hit_radius)
     end
 
-    def hit!
+    def hit(damage : Int32)
       @hit = true
+
+      @health -= damage
+
+      if @health <= 0
+        @health = 0
+
+        explode_remove
+      end
     end
 
     def update(frame_time)
@@ -80,6 +93,10 @@ module Phase
     def move(dx : Float64, dy : Float64)
       @x += dx
       @y += dy
+    end
+
+    def explode_remove
+      @remove = true
     end
   end
 end

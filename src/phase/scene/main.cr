@@ -42,7 +42,7 @@ module Phase::Scene
         return
       end
 
-      enemies.each(&.update(frame_time))
+      update_enemies(frame_time)
 
       ship.update(frame_time, keys, mouse, enemies)
 
@@ -53,6 +53,14 @@ module Phase::Scene
       enemies.each(&.draw(window))
       ship.draw(window)
       hud.draw(window)
+    end
+
+    def update_enemies(frame_time)
+      enemies.each(&.update(frame_time))
+
+      enemies.select(&.remove?).each do |enemy|
+        enemies.delete(enemy)
+      end
     end
   end
 end

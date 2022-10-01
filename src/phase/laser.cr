@@ -14,6 +14,7 @@ module Phase
     Height = 16
     HitRadius = 16
     MaxDistance = 3333
+    Damage = 20
 
     def initialize(x = 0_f32, y = 0_f32, rotation = 0)
       @x = x
@@ -84,7 +85,7 @@ module Phase
     def check_enemies(enemies : Array(Enemy))
       enemies.each do |enemy|
         if hit?(enemy.hit_circle)
-          enemy.hit!
+          enemy.hit(Damage)
 
           explode_remove
         end
