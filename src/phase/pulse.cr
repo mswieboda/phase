@@ -39,7 +39,7 @@ module Phase
     end
 
     def update(frame_time, x : Float64, y : Float64, enemies : Array(Enemy))
-      move(x, y)
+      move(x, y) unless firing?
 
       animations.update(frame_time)
 
