@@ -11,8 +11,6 @@ module Phase
     Sheet = "./assets/ship.png"
 
     def initialize(x = 0, y = 0)
-      # sprite size
-      size = 128
       @x = x
       @y = y
 
@@ -20,8 +18,9 @@ module Phase
       fps = 60
 
       # idle
+      idle_size = 128
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(Sheet, 0, 0, size, size)
+      idle.add(Sheet, 0, 0, idle_size, idle_size)
 
       @animations = GSF::Animations.new(:idle, idle)
 

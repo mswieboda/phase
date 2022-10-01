@@ -9,9 +9,9 @@ module Phase
     Sheet = "./assets/pulse.png"
     Duration = 10.seconds
 
+    Sizes = [128, 256, 384, 512, 640]
+
     def initialize(x = 0, y = 0)
-      # sprite size
-      size = 640
       @x = x
       @y = y
 
@@ -19,19 +19,20 @@ module Phase
       fps = 60
 
       # fire
-      fire_frames = 5
-      fire = GSF::Animation.new((fps / 10).to_i, loops: false)
+      pulse_size = 640
+      pulse_frames = 5
+      pulse = GSF::Animation.new((fps / 10).to_i, loops: false)
 
-      fire_frames.times do |index|
-        fire.add(Sheet, index * size, 0, size, size)
+      pulse_frames.times do |index|
+        pulse.add(Sheet, index * pulse_size, 0, pulse_size, pulse_size)
       end
 
       # add in extra frames at end
-      fire.add(Sheet, 4 * size, 0, size, size)
-      fire.add(Sheet, 4 * size, 0, size, size)
+      pulse.add(Sheet, 4 * pulse_size, 0, pulse_size, pulse_size)
+      pulse.add(Sheet, 4 * pulse_size, 0, pulse_size, pulse_size)
 
-      @animations = GSF::Animations.new(:fire, fire)
-      @animations.play(:fire)
+      @animations = GSF::Animations.new(:pulse, pulse)
+      @animations.play(:pulse)
       @timer = GSF::Timer.new(Duration)
       @firing = true
     end
@@ -50,7 +51,7 @@ module Phase
       if timer.done?
         timer.restart
 
-        animations.play(:fire)
+        animations.play(:pulse)
         @firing = true
       else
         timer.start unless timer.started?
