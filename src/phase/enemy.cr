@@ -13,7 +13,7 @@ module Phase
     HitColor = SF::Color::Red
     DebugHitBox = false
 
-    def initialize(x = 0, y = 0)
+    def initialize(x = 0, y = 0, sheet = Sheet)
       @x = x
       @y = y
 
@@ -23,7 +23,7 @@ module Phase
       # idle
       idle_size = size
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(Sheet, 0, 0, idle_size, idle_size)
+      idle.add(sheet, 0, 0, idle_size, idle_size)
 
       @animations = GSF::Animations.new(:idle, idle)
       @hit = false

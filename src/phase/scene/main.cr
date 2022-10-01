@@ -1,6 +1,7 @@
 require "../ship"
 require "../hud"
 require "../enemy"
+require "../enemy_kamikaze"
 
 module Phase::Scene
   class Main < GSF::Scene
@@ -11,7 +12,7 @@ module Phase::Scene
     def initialize
       super(:main)
 
-      @ship = Ship.new(x: 300, y: 300)
+      @ship = Ship.new(x: 750, y: 750)
       @hud = HUD.new(ship)
       @enemies = [] of Enemy
 
@@ -22,6 +23,16 @@ module Phase::Scene
         {x: 1500, y: 1500}
       ].each do |coords|
         @enemies << Enemy.new(x: coords[:x], y: coords[:y])
+      end
+
+      [
+        {x: 100, y: 300},
+        {x: 300, y: 300},
+        {x: 500, y: 300},
+        {x: 700, y: 300},
+        {x: 900, y: 300}
+      ].each do |coords|
+        @enemies << EnemyKamikaze.new(x: coords[:x], y: coords[:y])
       end
     end
 
