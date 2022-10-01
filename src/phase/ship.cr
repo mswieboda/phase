@@ -27,7 +27,7 @@ module Phase
     Sheet = "./assets/ship.png"
     ShipSize = 128
     ThrusterSheet = "./assets/thruster.png"
-    ThrusterSize = 32
+    ThrusterSize = 64
     FireDuration = 150.milliseconds
 
     def initialize(x = 0, y = 0)
@@ -49,37 +49,37 @@ module Phase
       move_size = ThrusterSize
       move_frames = 8
       move_factor = 20
-      move_top = GSF::Animation.new((fps / move_factor).to_i, loops: false)
+      top = GSF::Animation.new((fps / move_factor).to_i, loops: false)
 
       move_frames.times do |index|
-        move_top.add(ThrusterSheet, move_size * index, 0, move_size, move_size, flip_vertical: true)
+        top.add(ThrusterSheet, move_size * index, 0, move_size, move_size, rotation: 90)
       end
 
-      move_left = GSF::Animation.new((fps / move_factor).to_i, loops: false)
+      left = GSF::Animation.new((fps / move_factor).to_i, loops: false)
 
       move_frames.times do |index|
-        move_left.add(ThrusterSheet, move_size * index, 0, move_size, move_size, rotation: 90)
+        left.add(ThrusterSheet, move_size * index, 0, move_size, move_size)
       end
 
-      move_bottom = GSF::Animation.new((fps / move_factor).to_i, loops: false)
+      bottom = GSF::Animation.new((fps / move_factor).to_i, loops: false)
 
       move_frames.times do |index|
-        move_bottom.add(ThrusterSheet, move_size * index, 0, move_size, move_size)
+        bottom.add(ThrusterSheet, move_size * index, 0, move_size, move_size, rotation: -90)
       end
 
-      move_right = GSF::Animation.new((fps / move_factor).to_i, loops: false)
+      right = GSF::Animation.new((fps / move_factor).to_i, loops: false)
 
       move_frames.times do |index|
-        move_right.add(ThrusterSheet, move_size * index, 0, move_size, move_size, rotation: -90)
+        right.add(ThrusterSheet, move_size * index, 0, move_size, move_size, flip_horizontal: true)
       end
 
       @thrusters = {
         playing: [] of Symbol,
         animations: {
-          top: GSF::Animations.new(:move, move_top),
-          left: GSF::Animations.new(:move, move_left),
-          bottom: GSF::Animations.new(:move, move_bottom),
-          right: GSF::Animations.new(:move, move_right),
+          top: GSF::Animations.new(:move, top),
+          left: GSF::Animations.new(:move, left),
+          bottom: GSF::Animations.new(:move, bottom),
+          right: GSF::Animations.new(:move, right),
         }
       }
 
