@@ -2,12 +2,14 @@ require "../ship"
 require "../hud"
 require "../enemy"
 require "../enemy_kamikaze"
+require "../asteroid"
 
 module Phase::Scene
   class Main < GSF::Scene
     getter hud
     getter ship
     getter enemies : Array(Enemy)
+    getter asteroids : Array(Asteroid)
 
     def initialize
       super(:main)
@@ -15,7 +17,9 @@ module Phase::Scene
       @ship = Ship.new(x: 750, y: 750)
       @hud = HUD.new(ship)
       @enemies = [] of Enemy
+      @asteroids = [] of Asteroid
 
+      # enemies
       [
         {x: 500, y: 700},
         {x: 300, y: 900},
@@ -25,6 +29,7 @@ module Phase::Scene
         @enemies << Enemy.new(x: coords[:x], y: coords[:y])
       end
 
+      # kamikaze enemies
       [
         {x: 100, y: 300},
         {x: 300, y: 300},
@@ -33,6 +38,14 @@ module Phase::Scene
         {x: 900, y: 300}
       ].each do |coords|
         @enemies << EnemyKamikaze.new(x: coords[:x], y: coords[:y])
+      end
+
+      [
+        {x: 1500, y: 975, type: 1},
+        {x: 333, y: 1669, type: 2},
+        {x: 2033, y: 489, type: 3}
+      ].each do |meta|
+        @asteroids << Asteroid.new(x: meta[:x], y: meta[:y], sprite_type: meta[:type])
       end
     end
 
@@ -52,6 +65,7 @@ module Phase::Scene
     def draw(window)
       enemies.each(&.draw(window))
       ship.draw(window)
+      asteroids.each(&.draw(window))
       hud.draw(window)
     end
 
