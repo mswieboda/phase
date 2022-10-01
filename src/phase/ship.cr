@@ -137,6 +137,9 @@ module Phase
       cannon.update(frame_time, x, y, mouse.to_rotation(x, y))
       update_firing(mouse)
       lasers.each(&.update(frame_time, enemies))
+      lasers.select(&.remove?).each do |laser|
+        lasers.delete(laser)
+      end
     end
 
     def update_firing(mouse)
