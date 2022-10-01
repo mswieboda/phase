@@ -3,14 +3,14 @@ require "./box"
 require "./arc"
 
 module Phase
-  class SuperCannon < SuperWeapon
+  class Beam < SuperWeapon
     getter distance
     getter duration_timer
     getter sprite
     getter sprite_tip
 
-    SpriteSegment = "./assets/super_laser_segment.png"
-    SpriteTip = "./assets/super_laser_tip.png"
+    SpriteSegment = "./assets/beam.png"
+    SpriteTip = "./assets/beam_tip.png"
     Damage = 10
     Duration = 1337.milliseconds
     MaxDistance = 1337
@@ -21,7 +21,7 @@ module Phase
     delegate rotation, to: sprite
 
     def initialize(x = 0, y = 0, rotation = 0_f64)
-      super("laser")
+      super("beam")
 
       @distance = MaxDistance # TODO: start at 0_f64 and grow to MaxDistance quickly using another timer?
       @duration_timer = Timer.new(Duration)

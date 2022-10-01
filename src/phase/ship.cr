@@ -1,8 +1,8 @@
-require "./pulse"
 require "./laser"
 require "./cannon"
 require "./super_weapon"
-require "./super_cannon"
+require "./pulse"
+require "./beam"
 
 module Phase
   class Ship
@@ -19,14 +19,14 @@ module Phase
     getter x : Float64
     getter y : Float64
     getter animations
-    getter pulse : Pulse
     getter thrusters : ThrusterAnimationsTuple
     getter fire_timer : Timer
     getter lasers : Array(Laser)
     getter cannon : Cannon
     getter super_weapon : SuperWeapon
     getter super_weapons : Array(SuperWeapon)
-    getter super_cannon : SuperCannon
+    getter pulse : Pulse
+    getter beam : Beam
     getter super_weapon_timer : Timer
 
     Speed = 666
@@ -41,10 +41,10 @@ module Phase
       @x = x
       @y = y
       @pulse = Pulse.new(x, y)
-      @super_cannon = SuperCannon.new(x, y)
+      @beam = Beam.new(x, y)
       @super_weapons = [] of SuperWeapon
       @super_weapons << @pulse
-      @super_weapons << @super_cannon
+      @super_weapons << @beam
       @super_weapon = @super_weapons.first
       @super_weapon_timer = Timer.new(SuperWeaponDuration)
 
@@ -157,7 +157,7 @@ module Phase
 
     def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, enemies : Array(Enemy))
       pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, enemies)
-      super_cannon.update(frame_time, super_weapon == super_cannon, super_weapon_timer.done?, x, y, mouse.to_rotation(x, y), enemies)
+      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse.to_rotation(x, y), enemies)
 
       if !super_weapon_timer.started? || super_weapon_timer.done?
         super_weapon_timer.restart
