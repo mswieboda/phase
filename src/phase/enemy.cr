@@ -4,7 +4,7 @@ module Phase
     getter y : Float64
     getter animations
 
-    Sheet = "./assets/ship.png"
+    Sheet = "./assets/enemy.png"
 
     def initialize(x = 0, y = 0)
       @x = x
