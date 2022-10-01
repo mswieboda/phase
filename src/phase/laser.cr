@@ -33,11 +33,9 @@ module Phase
     def update_movement(frame_time)
       speed = Speed * frame_time
       theta = rotation * Math::PI / 180
-      dx = speed * Math.cos(theta)
-      dy = speed * Math.sin(theta)
 
-      @x += dx
-      @y += dy
+      @x += speed * Math.cos(theta)
+      @y += speed * Math.sin(theta)
     end
 
     def draw(window : SF::RenderWindow)

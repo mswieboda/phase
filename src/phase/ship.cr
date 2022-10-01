@@ -185,10 +185,7 @@ module Phase
     end
 
     def fire(mouse : Mouse)
-      rotation = mouse.to_rotation(x, y)
-
-      # TODO: place x, y inside the start or middle of the cannon
-      @lasers << Laser.new(x, y, rotation)
+      @lasers << Laser.new(x, y, mouse.to_rotation(x, y))
     end
 
     def play_thruster(dir : Symbol)

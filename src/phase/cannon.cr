@@ -12,7 +12,7 @@ module Phase
 
       texture = SF::Texture.from_file(SpriteFile, SF::IntRect.new(0, 0, width, height))
       @sprite = SF::Sprite.new(texture)
-      sprite.position = {x, y}
+      @sprite.position = {x, y}
       @sprite.origin = {height / 2, height / 2} # TODO: maybe tweak so not pivoted completely at the point
       @sprite.rotation = rotation
     end
