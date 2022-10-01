@@ -7,6 +7,7 @@ module Phase
     getter x : Float64
     getter y : Float64
     getter animations
+    getter fire_sound
 
     Sheet = "./assets/pulse.png"
     Duration = 10.seconds
@@ -15,6 +16,7 @@ module Phase
     InnerRadii = [0, 64, 128, 192, 256, 288, 304]
     DebugHitBox = false
     Damage = 10
+    FireSound = SF::SoundBuffer.from_file("./assets/pulse.wav")
 
     def initialize(x = 0, y = 0)
       super("pulse")
@@ -36,6 +38,7 @@ module Phase
 
       @animations = GSF::Animations.new(:pulse, pulse)
       @animations.play(:pulse)
+      @fire_sound = SF::Sound.new(FireSound)
     end
 
     def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, enemies : Array(Enemy))
@@ -46,8 +49,10 @@ module Phase
       @firing = false if firing? && animations.done?
 
       if current && timer_done
-        animations.play(:pulse)
         @firing = true
+
+        animations.play(:pulse)
+        fire_sound.play
       end
 
       if firing?
