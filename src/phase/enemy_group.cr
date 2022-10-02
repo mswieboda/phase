@@ -8,7 +8,7 @@ module Phase
     getter enemies : Array(EnemyShip)
 
     RotationSpeed = 100
-    TargetFacingThreshold = 3
+    FacingRotationThreshold = 0.1_f32
     TargetDistanceThreshold = 500
     TargetMoveSpeed = 333
 
@@ -64,16 +64,11 @@ module Phase
     def rotate_to_target(frame_time)
       target_rotation = rotation_to(star_base_target)
 
-      unless facing?(target_rotation)
-        sign = target_rotation >= 0 ? 1 : -1
-        amount = sign * RotationSpeed * frame_time
-
-        rotate(amount)
-      end
+      rotate_towards(target_rotation, RotationSpeed * frame_time) unless facing?(target_rotation)
     end
 
     def facing?(target_rotation)
-      (target_rotation - rotation).abs < TargetFacingThreshold
+      (target_rotation - rotation).abs < FacingRotationThreshold
     end
 
     def move_to_target(frame_time)
@@ -91,6 +86,17 @@ module Phase
     def rotate(amount)
       @rotation += amount
       enemies.each(&.rotate(amount))
+    end
+
+    def rotate_towards(target_rotation, rotation_speed)
+      sign = target_rotation >= rotation ? 1 : -1
+      amount = sign * rotation_speed
+
+      if (sign > 0 && rotation + amount > target_rotation) || (sign < 0 && rotation - amount < target_rotation)
+        @rotation = target_rotation.to_f32
+      else
+        rotate(amount)
+      end
     end
 
     def rotation_to(obj : HealthObj)
