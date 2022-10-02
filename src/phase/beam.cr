@@ -48,7 +48,7 @@ module Phase
       SegmentHeight * Screen.scaling_factor
     end
 
-    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, enemies : Array(Enemy))
+    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, shootables : Array(HealthObj))
       move(x, y, rotation)
 
       @firing = false if firing? && duration_timer.done?
@@ -60,8 +60,8 @@ module Phase
       end
 
       if firing?
-        enemies.each do |enemy|
-          enemy.hit(Damage) if hit?(enemy.hit_circle)
+        shootables.each do |shootable|
+          shootable.hit(Damage) if hit?(shootable.hit_circle)
         end
       end
     end

@@ -108,7 +108,7 @@ module Phase
       self.class.size
     end
 
-    def update(frame_time, keys : Keys, mouse : Mouse, enemies : Array(Enemy))
+    def update(frame_time, keys : Keys, mouse : Mouse, shootables : Array(HealthObj), bumpables : Array(HealthObj))
       animations.update(frame_time)
 
       thrusters[:animations].each do |dir, a|
@@ -118,8 +118,9 @@ module Phase
       mouse_rotation = mouse.to_rotation(Screen.width / 2, Screen.height / 2)
 
       update_movement(frame_time, keys)
-      update_cannon(frame_time, mouse, mouse_rotation, enemies)
-      update_super_weapon(frame_time, keys, mouse, mouse_rotation, enemies)
+      check_bumping(bumpables)
+      update_cannon(frame_time, mouse, mouse_rotation, shootables)
+      update_super_weapon(frame_time, keys, mouse, mouse_rotation, shootables)
     end
 
     def update_movement(frame_time, keys : Keys)
@@ -144,18 +145,21 @@ module Phase
       move(dx, dy) if dx != 0_f64 || dy != 0_f64
     end
 
-    def update_cannon(frame_time, mouse : Mouse, mouse_rotation : Float64, enemies : Array(Enemy))
+    def check_bumping(bumpables : Array(HealthObj))
+    end
+
+    def update_cannon(frame_time, mouse : Mouse, mouse_rotation : Float64, shootables : Array(HealthObj))
       cannon.update(frame_time, x, y, mouse_rotation)
       update_firing(mouse, mouse_rotation)
-      lasers.each(&.update(frame_time, enemies))
+      lasers.each(&.update(frame_time, shootables))
       lasers.select(&.remove?).each do |laser|
         lasers.delete(laser)
       end
     end
 
-    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, mouse_rotation : Float64, enemies : Array(Enemy))
-      pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, enemies)
-      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse_rotation, enemies)
+    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, mouse_rotation : Float64, shootables : Array(HealthObj))
+      pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, shootables)
+      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse_rotation, shootables)
 
       if !super_weapon_timer.started? || super_weapon_timer.done?
         super_weapon_timer.restart

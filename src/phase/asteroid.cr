@@ -28,6 +28,8 @@ module Phase
     end
 
     def draw(window : SF::RenderWindow)
+      sprite.color = health_color
+
       window.draw(sprite)
       draw_hit_circle(window)
     end

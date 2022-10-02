@@ -1,5 +1,6 @@
 require "../ship"
 require "../hud"
+require "../health_obj"
 require "../enemy"
 require "../enemy_kamikaze"
 require "../asteroid"
@@ -10,9 +11,9 @@ module Phase::Scene
     getter view : GSF::View
     getter hud
     getter ship
-    getter enemies : Array(Enemy)
-    getter asteroids : Array(Asteroid)
-    getter star_base : StarBase
+    getter shootables : Array(HealthObj)
+    getter bumpables : Array(HealthObj)
+    getter star_bases : Array(StarBase)
 
     def initialize(window)
       super(:main)
@@ -21,8 +22,12 @@ module Phase::Scene
 
       @ship = Ship.new(x: 750, y: 750)
       @hud = HUD.new(ship)
-      @enemies = [] of Enemy
-      @asteroids = [] of Asteroid
+      @shootables = [] of HealthObj
+      @bumpables = [] of HealthObj
+      @star_bases = [] of StarBase
+
+      enemies = [] of Enemy
+      asteroids = [] of Asteroid
 
       # enemies
       [
@@ -33,7 +38,7 @@ module Phase::Scene
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        @enemies << Enemy.new(x: x, y: y)
+        enemies << Enemy.new(x: x, y: y)
       end
 
       # kamikaze enemies
@@ -46,7 +51,7 @@ module Phase::Scene
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        @enemies << EnemyKamikaze.new(x: x, y: y)
+        enemies << EnemyKamikaze.new(x: x, y: y)
       end
 
       [
@@ -56,10 +61,13 @@ module Phase::Scene
       ].each do |meta|
         x = meta[:x] * Screen.scaling_factor
         y = meta[:y] * Screen.scaling_factor
-        @asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
+        asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
 
-      @star_base = StarBase.new(x: 1999, y: 1999)
+      @star_bases << StarBase.new(x: 1999, y: 1999)
+
+      @shootables.concat(enemies).concat(asteroids)
+      @bumpables.concat(enemies).concat(asteroids).concat(star_bases)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
@@ -68,9 +76,10 @@ module Phase::Scene
         return
       end
 
-      update_enemies(frame_time)
+      update_bumpables(frame_time)
 
-      ship.update(frame_time, keys, mouse, enemies)
+      ship.update(frame_time, keys, mouse, shootables, bumpables)
+
       view.center(ship.x, ship.y)
       hud.update(frame_time)
     end
@@ -79,9 +88,7 @@ module Phase::Scene
       # map view
       view.set_current
 
-      enemies.each(&.draw(window))
-      asteroids.each(&.draw(window))
-      star_base.draw(window)
+      bumpables.each(&.draw(window))
       ship.draw(window)
 
       # default view
@@ -90,11 +97,12 @@ module Phase::Scene
       hud.draw(window)
     end
 
-    def update_enemies(frame_time)
-      enemies.each(&.update(frame_time))
+    def update_bumpables(frame_time)
+      bumpables.each(&.update(frame_time))
 
-      enemies.select(&.remove?).each do |enemy|
-        enemies.delete(enemy)
+      bumpables.select(&.remove?).each do |bumpable|
+        shootables.delete(bumpable)
+        bumpables.delete(bumpable)
       end
     end
   end

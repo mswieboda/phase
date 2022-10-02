@@ -47,13 +47,13 @@ module Phase
       Math.sqrt(dx * dx + dy * dy)
     end
 
-    def update(frame_time, enemies : Array(Enemy))
+    def update(frame_time, shootables : Array(HealthObj))
       animations.update(frame_time)
 
       update_movement(frame_time)
 
       check_distance
-      check_enemies(enemies)
+      check_shootables(shootables)
     end
 
     def update_movement(frame_time)
@@ -82,10 +82,10 @@ module Phase
       fade_remove if distance > MaxDistance * Screen.scaling_factor
     end
 
-    def check_enemies(enemies : Array(Enemy))
-      enemies.each do |enemy|
-        if hit?(enemy.hit_circle)
-          enemy.hit(Damage)
+    def check_shootables(shootables : Array(HealthObj))
+      shootables.each do |shootable|
+        if hit?(shootable.hit_circle)
+          shootable.hit(Damage)
 
           explode_remove
         end
