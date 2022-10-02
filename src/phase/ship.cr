@@ -1,3 +1,4 @@
+require "./health_obj"
 require "./laser"
 require "./cannon"
 require "./super_weapon"
@@ -5,7 +6,7 @@ require "./pulse"
 require "./beam"
 
 module Phase
-  class Ship
+  class Ship < HealthObj
     alias ThrusterAnimationsTuple = NamedTuple(
       playing: Array(Symbol),
       animations: NamedTuple(
@@ -16,8 +17,6 @@ module Phase
       )
     )
 
-    getter x : Float64
-    getter y : Float64
     getter animations
     getter thrusters : ThrusterAnimationsTuple
     getter fire_timer : Timer
@@ -32,14 +31,16 @@ module Phase
     Speed = 666
     Sheet = "./assets/ship.png"
     ShipSize = 128
+    HitRadius = 64
     ThrusterSheet = "./assets/thruster.png"
     ThrusterSize = 64
     FireDuration = 150.milliseconds
     SuperWeaponDuration = 10.seconds
+    BumpBackFactor = 3
 
     def initialize(x = 0, y = 0)
-      @x = x
-      @y = y
+      super(x, y)
+
       @pulse = Pulse.new(x, y)
       @beam = Beam.new(x, y)
       @super_weapons = [] of SuperWeapon
@@ -108,7 +109,13 @@ module Phase
       self.class.size
     end
 
+    def self.hit_radius
+      HitRadius * Screen.scaling_factor
+    end
+
     def update(frame_time, keys : Keys, mouse : Mouse, shootables : Array(HealthObj), bumpables : Array(HealthObj))
+      super(frame_time)
+
       animations.update(frame_time)
 
       thrusters[:animations].each do |dir, a|
@@ -117,13 +124,12 @@ module Phase
 
       mouse_rotation = mouse.to_rotation(Screen.width / 2, Screen.height / 2)
 
-      update_movement(frame_time, keys)
-      check_bumping(bumpables)
+      update_movement(frame_time, keys, bumpables)
       update_cannon(frame_time, mouse, mouse_rotation, shootables)
       update_super_weapon(frame_time, keys, mouse, mouse_rotation, shootables)
     end
 
-    def update_movement(frame_time, keys : Keys)
+    def update_movement(frame_time, keys : Keys, bumpables : Array(HealthObj))
       dx = 0_f64
       dy = 0_f64
       speed = Speed * Screen.scaling_factor * frame_time
@@ -142,10 +148,19 @@ module Phase
         dy *= const
       end
 
-      move(dx, dy) if dx != 0_f64 || dy != 0_f64
+      move(dx, dy)
+
+      if bumped?(bumpables)
+        move(-dx * BumpBackFactor, -dy * BumpBackFactor)
+      end
     end
 
-    def check_bumping(bumpables : Array(HealthObj))
+    def bumped?(bumpables : Array(HealthObj))
+      bumpables.any? do |bumpable|
+        if hit?(bumpable.hit_circle)
+          hit(bumpable.collision_damage)
+        end
+      end
     end
 
     def update_cannon(frame_time, mouse : Mouse, mouse_rotation : Float64, shootables : Array(HealthObj))
@@ -209,7 +224,7 @@ module Phase
     end
 
     def draw(window : SF::RenderWindow)
-      animations.draw(window, x, y)
+      animations.draw(window, x, y, color: health_color)
 
       [:top, :left, :bottom, :right].each do |dir|
         if thrusters[:playing].includes?(dir)
