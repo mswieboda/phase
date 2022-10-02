@@ -86,11 +86,13 @@ module Phase::Scene
 
       # enemy carriers
       [
-        {x: 900, y: 100}
+        {x: 0, y: 0, drop_off_x: 900, drop_off_y: 100}
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        @enemy_carriers << EnemyCarrier.new(x: x, y: y)
+        drop_off_x = coords[:drop_off_x] * Screen.scaling_factor
+        drop_off_y = coords[:drop_off_y] * Screen.scaling_factor
+        @enemy_carriers << EnemyCarrier.new(x: x, y: y, drop_off_x: drop_off_x, drop_off_y: drop_off_y)
       end
 
       @shootables

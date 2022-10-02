@@ -8,11 +8,13 @@ module Phase
     Sheet = "./assets/enemy.png"
     SpriteSize = 128
     HitRadius = 64
+    FacingRotationThreshold = 0.1_f32
+    RotationSpeed = 100
 
-    def initialize(x = 0, y = 0)
+    def initialize(x = 0, y = 0, rotation = 0)
       super(x, y)
 
-      @rotation = 0
+      @rotation = rotation
 
       # init animations
       fps = 60
@@ -66,6 +68,34 @@ module Phase
     def move(dx : Float64, dy : Float64)
       @x += dx
       @y += dy
+    end
+
+    def facing?(target_rotation)
+      (target_rotation - rotation).abs < FacingRotationThreshold
+    end
+
+    def move_forward(speed)
+      theta = rotation * Math::PI / 180
+      dx = speed * Math.cos(theta)
+      dy = speed * Math.sin(theta)
+
+      @x += dx
+      @y += dy
+    end
+
+    def rotate(amount)
+      @rotation += amount
+    end
+
+    def rotate_towards(target_rotation, rotation_speed)
+      sign = target_rotation >= rotation ? 1 : -1
+      amount = sign * rotation_speed
+
+      if (sign > 0 && rotation + amount > target_rotation) || (sign < 0 && rotation - amount < target_rotation)
+        @rotation = target_rotation.to_f32
+      else
+        rotate(amount)
+      end
     end
   end
 end

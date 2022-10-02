@@ -111,6 +111,10 @@ module Phase
       @hit = false
     end
 
+    def rotation_to(other_x, other_y)
+      rotation_from(other_x, other_y) - 180
+    end
+
     def rotation_to(obj : HealthObj)
       obj.rotation_from(self)
     end
@@ -139,10 +143,14 @@ module Phase
     end
 
     def distance(obj : HealthObj)
-      dx = x - obj.x
-      dy = y - obj.y
+      distance(obj.x, obj.y, obj.hit_radius)
+    end
 
-      Math.sqrt(dx * dx + dy * dy) - obj.hit_radius
+    def distance(cx, cy, radius = 0)
+      dx = x - cx
+      dy = y - cy
+
+      Math.sqrt(dx * dx + dy * dy) - radius
     end
   end
 end

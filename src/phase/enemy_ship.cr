@@ -6,10 +6,9 @@ module Phase
     getter star_base_target : StarBase
 
     Sheet = "./assets/enemy.png"
-    RotationSpeed = 100
-    TargetFacingThreshold = 3
     TargetDistanceThreshold = 500
     TargetMoveSpeed = 333
+    RotationSpeed = 100
 
     def initialize(x, y, star_base : StarBase)
       super(x, y)
@@ -43,16 +42,7 @@ module Phase
     def rotate_to_target(frame_time)
       target_rotation = rotation_to(star_base_target)
 
-      unless facing?(target_rotation)
-        sign = target_rotation >= 0 ? 1 : -1
-        amount = sign * RotationSpeed * frame_time
-
-        rotate(amount)
-      end
-    end
-
-    def facing?(target_rotation)
-      (target_rotation - rotation).abs < TargetFacingThreshold
+      rotate_towards(target_rotation, RotationSpeed * frame_time) unless facing?(target_rotation)
     end
 
     def move_to_target(frame_time)
@@ -61,19 +51,6 @@ module Phase
       unless target_distance.abs < TargetDistanceThreshold
         move_forward(TargetMoveSpeed * frame_time)
       end
-    end
-
-    def move_forward(speed)
-      theta = rotation * Math::PI / 180
-      dx = speed * Math.cos(theta)
-      dy = speed * Math.sin(theta)
-
-      @x += dx
-      @y += dy
-    end
-
-    def rotate(amount)
-      @rotation += amount
     end
   end
 end
