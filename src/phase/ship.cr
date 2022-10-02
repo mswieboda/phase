@@ -52,9 +52,8 @@ module Phase
 
       # ship animations
       # idle
-      idle_size = size
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(Sheet, 0, 0, idle_size, idle_size)
+      idle.add(Sheet, 0, 0, ShipSize, ShipSize)
 
       @animations = GSF::Animations.new(:idle, idle)
 
@@ -102,7 +101,7 @@ module Phase
     end
 
     def self.size
-      ShipSize
+      ShipSize * Screen.scaling_factor
     end
 
     def size
@@ -124,7 +123,7 @@ module Phase
     def update_movement(frame_time, keys : Keys)
       dx = 0_f64
       dy = 0_f64
-      speed = Speed * frame_time
+      speed = Speed * Screen.scaling_factor * frame_time
 
       dy -= speed if keys.pressed?(Keys::W)
       dx -= speed if keys.pressed?(Keys::A)
@@ -216,13 +215,13 @@ module Phase
 
           case dir
           when :top
-            draw_y = draw_y - size / 2 - ThrusterSize / 2
+            draw_y = draw_y - size / 2 - ThrusterSize * Screen.scaling_factor / 2
           when :left
-            draw_x = draw_x - size / 2 - ThrusterSize / 2
+            draw_x = draw_x - size / 2 - ThrusterSize * Screen.scaling_factor / 2
           when :bottom
-            draw_y = draw_y + size / 2 + ThrusterSize / 2
+            draw_y = draw_y + size / 2 + ThrusterSize * Screen.scaling_factor / 2
           when :right
-            draw_x = draw_x + size / 2 + ThrusterSize / 2
+            draw_x = draw_x + size / 2 + ThrusterSize * Screen.scaling_factor / 2
           end
 
           thrusters[:animations][dir].draw(window, draw_x, draw_y)

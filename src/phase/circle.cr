@@ -2,9 +2,9 @@ module Phase
   class Circle
     property x : Float64
     property y : Float64
-    property radius : Int32
+    property radius : Float64
 
-    def initialize(x = 0_f32, y = 0_f32, radius = 1)
+    def initialize(x = 0, y = 0, radius = 1)
       @x = x
       @y = y
       @radius = radius

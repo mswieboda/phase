@@ -2,8 +2,8 @@ module Phase
   class Box
     property x : Float64
     property y : Float64
-    property width : Int32
-    property height : Int32
+    property width : Float64
+    property height : Float64
     property rotation : Float64
     property origin_x : Float64
     property origin_y : Float64

@@ -21,6 +21,9 @@ module Phase
 
       puts ">>> SF::VideoMode.fullscreen_modes:"
       puts ">>> #{SF::VideoMode.fullscreen_modes}"
+      puts ">>> SF::VideoMode.desktop_mode:"
+      puts ">>> #{SF::VideoMode.desktop_mode}"
+      puts ">>> Screen.scaling_factor: #{Screen.scaling_factor}"
 
       @stage = Stage.new(window)
     end

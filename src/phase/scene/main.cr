@@ -26,7 +26,9 @@ module Phase::Scene
         {x: 900, y: 100},
         {x: 1500, y: 1500}
       ].each do |coords|
-        @enemies << Enemy.new(x: coords[:x], y: coords[:y])
+        x = coords[:x] * Screen.scaling_factor
+        y = coords[:y] * Screen.scaling_factor
+        @enemies << Enemy.new(x: x, y: y)
       end
 
       # kamikaze enemies
@@ -37,7 +39,9 @@ module Phase::Scene
         {x: 700, y: 300},
         {x: 900, y: 300}
       ].each do |coords|
-        @enemies << EnemyKamikaze.new(x: coords[:x], y: coords[:y])
+        x = coords[:x] * Screen.scaling_factor
+        y = coords[:y] * Screen.scaling_factor
+        @enemies << EnemyKamikaze.new(x: x, y: y)
       end
 
       [
@@ -45,7 +49,9 @@ module Phase::Scene
         {x: 333, y: 1669, type: 2},
         {x: 2033, y: 489, type: 3}
       ].each do |meta|
-        @asteroids << Asteroid.new(x: meta[:x], y: meta[:y], sprite_type: meta[:type])
+        x = meta[:x] * Screen.scaling_factor
+        y = meta[:y] * Screen.scaling_factor
+        @asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
     end
 

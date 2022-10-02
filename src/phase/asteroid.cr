@@ -1,20 +1,17 @@
 module Phase
   class Asteroid
-    getter x
-    getter y
+    getter x : Float64
+    getter y : Float64
     getter sprite : SF::Sprite
     getter? remove
 
     Size = 256
-    Height = 16
     HitRadius = 128
     Damage = 15
 
     def initialize(x = 0, y = 0, sprite_type = 1, rotation = 0)
       @x = x
       @y = y
-      @init_x = x
-      @init_y = y
       @rotation = rotation
 
       # sprite
@@ -28,7 +25,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius
+      HitRadius * Screen.scaling_factor
     end
 
     def hit_radius

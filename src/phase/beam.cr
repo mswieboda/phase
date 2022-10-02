@@ -4,7 +4,7 @@ require "./arc"
 
 module Phase
   class Beam < SuperWeapon
-    getter distance
+    getter distance : Float64
     getter duration_timer
     getter sprite
     getter sprite_tip
@@ -23,14 +23,15 @@ module Phase
     def initialize(x = 0, y = 0, rotation = 0_f64)
       super("beam")
 
-      @distance = MaxDistance # TODO: start at 0_f64 and grow to MaxDistance quickly using another timer?
+      # TODO: start at 0_f64 and grow to MaxDistance quickly using another timer?
+      @distance = MaxDistance * Screen.scaling_factor
       @duration_timer = Timer.new(Duration)
 
       # sprite
       texture = SF::Texture.from_file(SpriteSegment, SF::IntRect.new(0, 0, SegmentWidth, SegmentHeight))
       texture.repeated = true
 
-      @sprite = SF::Sprite.new(texture, SF::IntRect.new(0, 0, @distance, SegmentHeight))
+      @sprite = SF::Sprite.new(texture, SF::IntRect.new(0, 0, @distance.round.to_i, SegmentHeight))
       @sprite.position = {x, y}
       @sprite.origin = {0, texture.size.y / 2.0}
       @sprite.rotation = rotation
@@ -41,6 +42,10 @@ module Phase
       @sprite_tip.position = {x, y}
       @sprite_tip.origin = {-@distance, texture.size.y / 2.0}
       @sprite_tip.rotation = rotation
+    end
+
+    def height
+      SegmentHeight * Screen.scaling_factor
     end
 
     def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, enemies : Array(Enemy))
@@ -70,8 +75,8 @@ module Phase
 
     def hit?(circle : Circle) : Bool
       x = sprite.position.x
-      y = sprite.position.y - SegmentHeight / 2
-      box = Box.new(x, y, distance, SegmentHeight, rotation, sprite.position.x, sprite.position.y)
+      y = sprite.position.y - height / 2
+      box = Box.new(x, y, distance, height, rotation, sprite.position.x, sprite.position.y)
       circle.intersects?(box)
     end
 

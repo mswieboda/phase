@@ -26,24 +26,15 @@ module Phase
       fps = 60
 
       # idle
-      idle_size = size
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(sheet, 0, 0, idle_size, idle_size)
+      idle.add(sheet, 0, 0, Size, Size)
 
       @animations = GSF::Animations.new(:idle, idle)
       @hit = false
     end
 
-    def self.size
-      Size
-    end
-
-    def size
-      self.class.size
-    end
-
     def self.hit_radius
-      HitRadius
+      HitRadius * Screen.scaling_factor
     end
 
     def hit_radius

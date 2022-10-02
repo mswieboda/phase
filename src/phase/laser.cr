@@ -33,7 +33,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius
+      HitRadius * Screen.scaling_factor
     end
 
     def hit_radius
@@ -57,7 +57,7 @@ module Phase
     end
 
     def update_movement(frame_time)
-      speed = Speed * frame_time
+      speed = Speed * Screen.scaling_factor * frame_time
       theta = rotation * Math::PI / 180
 
       @x += speed * Math.cos(theta)
@@ -79,7 +79,7 @@ module Phase
     end
 
     def check_distance
-      fade_remove if distance > MaxDistance
+      fade_remove if distance > MaxDistance * Screen.scaling_factor
     end
 
     def check_enemies(enemies : Array(Enemy))

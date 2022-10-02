@@ -2,8 +2,8 @@ module Phase
   class Arc
     property x : Float64
     property y : Float64
-    property inner_radius : Int32
-    property outer_radius : Int32
+    property inner_radius : Float64
+    property outer_radius : Float64
 
     def initialize(x = 0_f32, y = 0_f32, inner_radius = 1, outer_radius = 1)
       @x = x

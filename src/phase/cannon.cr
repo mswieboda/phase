@@ -10,27 +10,12 @@ module Phase
     def initialize(x = 0_f32, y = 0_f32, rotation = 0)
       @rotation = rotation
 
-      texture = SF::Texture.from_file(SpriteFile, SF::IntRect.new(0, 0, width, height))
+      texture = SF::Texture.from_file(SpriteFile, SF::IntRect.new(0, 0, SpriteWidth, SpriteHeight))
       @sprite = SF::Sprite.new(texture)
       @sprite.position = {x, y}
-      @sprite.origin = {height / 2, height / 2} # TODO: maybe tweak so not pivoted completely at the point
+      @sprite.origin = {SpriteHeight / 2, SpriteHeight / 2}
+      @sprite.scale = {Screen.scaling_factor, Screen.scaling_factor}
       @sprite.rotation = rotation
-    end
-
-    def self.width
-      SpriteWidth
-    end
-
-    def width
-      self.class.width
-    end
-
-    def self.height
-      SpriteHeight
-    end
-
-    def height
-      self.class.height
     end
 
     def update(frame_time, x, y, rotation : Float64)

@@ -12,6 +12,7 @@ module Phase
     Sheet = "./assets/pulse.png"
     Duration = 10.seconds
 
+    SpriteSize = 640
     OuterRadii = [64, 128, 192, 256, 320, 320, 320]
     InnerRadii = [0, 64, 128, 192, 256, 288, 304]
     DebugHitBox = false
@@ -28,7 +29,7 @@ module Phase
       fps = 60
 
       # fire
-      pulse_size = 640
+      pulse_size = SpriteSize
       pulse_frames = 7
       pulse = GSF::Animation.new((fps / 10).to_i, loops: false)
 
@@ -101,8 +102,8 @@ module Phase
       display_frame = animations.display_frame
 
       {
-        outer: OuterRadii[display_frame],
-        inner: InnerRadii[display_frame]
+        outer: OuterRadii[display_frame] * Screen.scaling_factor,
+        inner: InnerRadii[display_frame] * Screen.scaling_factor
       }
     end
 

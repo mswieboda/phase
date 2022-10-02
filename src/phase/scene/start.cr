@@ -13,10 +13,10 @@ module Phase::Scene
       @items = GSF::MenuItems.new(
         font: Font.default,
         labels: ["start", "exit"],
-        size: 36
+        size: (36 * Screen.scaling_factor).to_i
       )
 
-      @title = SF::Text.new("phase", Font.default, 60)
+      @title = SF::Text.new("phase", Font.default, (60 * Screen.scaling_factor).to_i)
       @title.fill_color = TitleTextColor
 
       title_x = Screen.width / 2 - @title.global_bounds.width / 2

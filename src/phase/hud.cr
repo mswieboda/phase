@@ -14,15 +14,23 @@ module Phase
     def initialize(ship : Ship)
       @ship = ship
 
-      @text = SF::Text.new("", Font.default, 24)
+      @text = SF::Text.new("", Font.default, (24 * Screen.scaling_factor).to_i)
       @text.fill_color = SF::Color::Green
-      @text.position = {Margin, Margin}
+      @text.position = {margin, margin}
 
-      y = @text.global_bounds.top + @text.global_bounds.height + Margin
+      y = @text.global_bounds.top + @text.global_bounds.height + margin
 
-      @super_weapon_text = SF::Text.new("", Font.default, 24)
+      @super_weapon_text = SF::Text.new("", Font.default, (24 * Screen.scaling_factor).to_i)
       @super_weapon_text.fill_color = TextColor
-      @super_weapon_text.position = {Margin, y}
+      @super_weapon_text.position = {margin, y}
+    end
+
+    def self.margin
+      Margin * Screen.scaling_factor
+    end
+
+    def margin
+      self.class.margin
     end
 
     def update(frame_time)
@@ -36,12 +44,12 @@ module Phase
     end
 
     def draw_super_weapons(window)
-      y = @text.global_bounds.top + @text.global_bounds.height + Margin
+      y = @text.global_bounds.top + @text.global_bounds.height + margin
 
       ship.super_weapons.each_with_index do |weapon, index|
         super_weapon_text.string = weapon.name
-        y += super_weapon_text.global_bounds.height + Margin
-        super_weapon_text.position = {Margin, y}
+        y += super_weapon_text.global_bounds.height + margin
+        super_weapon_text.position = {margin, y}
         selected = ship.super_weapon.name == weapon.name
         super_weapon_text.fill_color = selected ? TextSelectedColor : TextColor
 

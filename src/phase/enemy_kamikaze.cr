@@ -11,12 +11,8 @@ module Phase
       super(x, y, Sheet)
     end
 
-    def self.size
-      Size
-    end
-
     def self.hit_radius
-      HitRadius
+      HitRadius * Screen.scaling_factor
     end
   end
 end
