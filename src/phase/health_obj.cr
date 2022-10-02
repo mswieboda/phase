@@ -26,7 +26,7 @@ module Phase
       @remove = false
       @hit = false
       @hit_sound = SF::Sound.new(HitSound)
-      @hit_sound.volume = 13
+      @hit_sound.volume = 33
     end
 
     def self.hit_radius

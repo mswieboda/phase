@@ -101,7 +101,7 @@ module Phase
 
       @fire_timer = Timer.new(FireDuration)
       @fire_sound = SF::Sound.new(FireSound)
-      @fire_sound.volume = 13
+      @fire_sound.volume = 33
       @lasers = [] of Laser
       @cannon = Cannon.new(x, y)
     end
