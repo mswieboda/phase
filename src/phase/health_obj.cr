@@ -49,8 +49,16 @@ module Phase
       self.class.collision_damage
     end
 
+    def self.unhit_color
+      UnhitColor
+    end
+
+    def unhit_color
+      self.class.unhit_color
+    end
+
     def health_color
-      hit? ? HitColor : UnhitColor
+      hit? ? HitColor : unhit_color
     end
 
     def update(frame_time)

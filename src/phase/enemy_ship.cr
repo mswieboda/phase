@@ -1,8 +1,8 @@
 require "./enemy"
 
 module Phase
-  class EnemyKamikaze < Enemy
-    Sheet = "./assets/kamikaze.png"
+  class EnemyShip < Enemy
+    Sheet = "./assets/enemy.png"
     Size = 128
     HitRadius = 64
 

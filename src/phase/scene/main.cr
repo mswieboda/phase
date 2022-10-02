@@ -1,8 +1,9 @@
 require "../ship"
 require "../hud"
 require "../health_obj"
-require "../enemy"
+require "../enemy_static"
 require "../enemy_kamikaze"
+require "../enemy_ship"
 require "../asteroid"
 require "../star_base"
 
@@ -20,7 +21,7 @@ module Phase::Scene
 
       @view = GSF::View.from_default(window).dup
 
-      @ship = Ship.new(x: 750, y: 750)
+      @ship = Ship.new(x: 1000, y: 1000)
       @hud = HUD.new(ship)
       @shootables = [] of HealthObj
       @bumpables = [] of HealthObj
@@ -29,7 +30,7 @@ module Phase::Scene
       enemies = [] of Enemy
       asteroids = [] of Asteroid
 
-      # enemies
+      # enemies (static)
       [
         {x: 500, y: 700},
         {x: 300, y: 900},
@@ -38,20 +39,26 @@ module Phase::Scene
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        enemies << Enemy.new(x: x, y: y)
+        enemies << EnemyStatic.new(x: x, y: y)
       end
 
       # kamikaze enemies
       [
         {x: 100, y: 300},
-        {x: 300, y: 300},
-        {x: 500, y: 300},
-        {x: 700, y: 300},
-        {x: 900, y: 300}
+        {x: 300, y: 300}
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
         enemies << EnemyKamikaze.new(x: x, y: y)
+      end
+
+      # enemy ships
+      [
+        {x: 600, y: 300}
+      ].each do |coords|
+        x = coords[:x] * Screen.scaling_factor
+        y = coords[:y] * Screen.scaling_factor
+        enemies << EnemyShip.new(x: x, y: y)
       end
 
       [
