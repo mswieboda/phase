@@ -1,20 +1,19 @@
+require "./health_obj"
+
 module Phase
-  class StarBase
-    getter x : Float64
-    getter y : Float64
+  class StarBase < HealthObj
     getter sprite : SF::Sprite
-    getter? remove
 
     Sprite = "./assets/star_base_small.png"
-    Size = 900
+    SpriteSize = 900
     HitRadius = 450
+    MaxHealth = 1000
 
     def initialize(x = 0, y = 0)
-      @x = x
-      @y = y
+      super(x, y)
 
       # sprite
-      texture = SF::Texture.from_file(Sprite, SF::IntRect.new(0, 0, Size, Size))
+      texture = SF::Texture.from_file(Sprite, SF::IntRect.new(0, 0, SpriteSize, SpriteSize))
       @sprite = SF::Sprite.new(texture)
       @sprite.position = {x, y}
       @sprite.origin = texture.size / 2.0
@@ -26,16 +25,13 @@ module Phase
       HitRadius * Screen.scaling_factor
     end
 
+    def self.max_health
+      MaxHealth
+    end
+
     def draw(window : SF::RenderWindow)
       window.draw(sprite)
-    end
-
-    def hit_circle
-      Circle.new(x: x, y: y, radius: hit_radius)
-    end
-
-    def hit?(circle : Circle)
-      hit_circle.intersects?(circle)
+      draw_hit_circle(window)
     end
   end
 end

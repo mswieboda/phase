@@ -1,21 +1,20 @@
-module Phase
-  class Asteroid
-    getter x : Float64
-    getter y : Float64
-    getter sprite : SF::Sprite
-    getter? remove
+require "./health_obj"
 
-    Size = 256
+module Phase
+  class Asteroid < HealthObj
+    getter sprite : SF::Sprite
+
+    SpriteSize = 256
     HitRadius = 128
-    Damage = 15
 
     def initialize(x = 0, y = 0, sprite_type = 1, rotation = 0)
-      @x = x
-      @y = y
+      super(x, y)
+
       @rotation = rotation
 
       # sprite
-      texture = SF::Texture.from_file("./assets/small_asteroid_#{sprite_type}.png", SF::IntRect.new(0, 0, Size, Size))
+      texture_file = "./assets/small_asteroid_#{sprite_type}.png"
+      texture = SF::Texture.from_file(texture_file, SF::IntRect.new(0, 0, SpriteSize, SpriteSize))
       @sprite = SF::Sprite.new(texture)
       @sprite.position = {x, y}
       @sprite.origin = texture.size / 2.0
@@ -28,23 +27,9 @@ module Phase
       HitRadius * Screen.scaling_factor
     end
 
-    def hit_radius
-      self.class.hit_radius
-    end
-
-    def update(frame_time)
-    end
-
     def draw(window : SF::RenderWindow)
       window.draw(sprite)
-    end
-
-    def hit_circle
-      Circle.new(x: x, y: y, radius: hit_radius)
-    end
-
-    def hit?(circle : Circle)
-      hit_circle.intersects?(circle)
+      draw_hit_circle(window)
     end
   end
 end

@@ -80,9 +80,9 @@ module Phase::Scene
       view.set_current
 
       enemies.each(&.draw(window))
-      ship.draw(window)
       asteroids.each(&.draw(window))
       star_base.draw(window)
+      ship.draw(window)
 
       # default view
       view.set_default_current

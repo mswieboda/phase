@@ -16,7 +16,7 @@ module Phase
     OuterRadii = [64, 128, 192, 256, 320, 320, 320]
     InnerRadii = [0, 64, 128, 192, 256, 288, 304]
     DebugHitBox = false
-    Damage = 10
+    Damage = 30
     FireSound = SF::SoundBuffer.from_file("./assets/pulse.wav")
 
     def initialize(x = 0, y = 0)
