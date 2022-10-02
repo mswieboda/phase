@@ -37,6 +37,7 @@ module Phase
     FireDuration = 150.milliseconds
     SuperWeaponDuration = 10.seconds
     BumpBackFactor = 3
+    LaserColor = SF::Color::Green
 
     def initialize(x = 0, y = 0)
       super(x, y)
@@ -252,7 +253,7 @@ module Phase
     end
 
     def fire(mouse_rotation : Float64)
-      @lasers << Laser.new(x, y, mouse_rotation)
+      @lasers << Laser.new(x, y, mouse_rotation, LaserColor)
     end
 
     def play_thruster(dir : Symbol)

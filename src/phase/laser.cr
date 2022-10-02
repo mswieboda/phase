@@ -15,8 +15,9 @@ module Phase
     HitRadius = 16
     MaxDistance = 3333
     Damage = 20
+    LaserColor = SF::Color::White
 
-    def initialize(x = 0_f32, y = 0_f32, rotation = 0)
+    def initialize(x = 0_f32, y = 0_f32, rotation = 0, color = LaserColor)
       @x = x
       @y = y
       @init_x = x
@@ -26,7 +27,7 @@ module Phase
       # animations
       fps = 60
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(Sheet, 0, 0, Width, Height, rotation: rotation)
+      idle.add(Sheet, 0, 0, Width, Height, rotation: rotation, color: color)
 
       @animations = GSF::Animations.new(:idle, idle)
       @remove = false
