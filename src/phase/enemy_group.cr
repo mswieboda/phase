@@ -2,30 +2,43 @@ require "./enemy"
 require "./star_base"
 
 module Phase
-  class EnemyShip < Enemy
+  class EnemyGroup
+    getter rotation : Float32
     getter star_base_target : StarBase
+    getter enemies : Array(EnemyShip)
 
-    Sheet = "./assets/enemy.png"
-    Size = 128
-    HitRadius = 64
     RotationSpeed = 100
     TargetFacingThreshold = 3
     TargetDistanceThreshold = 500
     TargetMoveSpeed = 333
 
-    def initialize(x, y, star_base : StarBase)
-      super(x, y, Sheet)
-
+    def initialize(star_base : StarBase, enemies = [] of EnemyShip)
+      @rotation = 0
       @star_base_target = star_base
+      @enemies = enemies
     end
 
-    def self.hit_radius
-      HitRadius * Screen.scaling_factor
+    def mid_x
+      points = enemies.map(&.x)
+
+      points.min + (points.max - points.min) / 2
+    end
+
+    def mid_y
+      points = enemies.map(&.y)
+
+      points.min + (points.max - points.min) / 2
+    end
+
+    def x
+      mid_x
+    end
+
+    def y
+      mid_y
     end
 
     def update(frame_time, star_bases : Array(StarBase))
-      super(frame_time)
-
       target_next_star_base(star_bases)
 
       update_movement(frame_time)
@@ -66,16 +79,23 @@ module Phase
     end
 
     def move_forward(speed)
-      theta = rotation * Math::PI / 180
-      dx = speed * Math.cos(theta)
-      dy = speed * Math.sin(theta)
-
-      @x += dx
-      @y += dy
+      enemies.each(&.move_forward(speed))
     end
 
     def rotate(amount)
       @rotation += amount
+      enemies.each(&.rotate(amount))
+    end
+
+    def rotation_to(obj : HealthObj)
+      obj.rotation_from(x, y)
+    end
+
+    def distance(obj : HealthObj)
+      dx = x - obj.x
+      dy = y - obj.y
+
+      Math.sqrt(dx * dx + dy * dy) - obj.hit_radius
     end
   end
 end

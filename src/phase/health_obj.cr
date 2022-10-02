@@ -111,8 +111,12 @@ module Phase
     end
 
     def rotation_from(obj : HealthObj)
-      dx = x - obj.x
-      dy = y - obj.y
+      rotation_from(obj.x, obj.y)
+    end
+
+    def rotation_from(other_x, other_y)
+      dx = x - other_x
+      dy = y - other_y
 
       if dx == 0
         if dy > 0

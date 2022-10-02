@@ -4,6 +4,7 @@ require "../health_obj"
 require "../enemy_static"
 require "../enemy_kamikaze"
 require "../enemy_ship"
+require "../enemy_group"
 require "../asteroid"
 require "../star_base"
 
@@ -16,6 +17,7 @@ module Phase::Scene
     getter bumpables : Array(HealthObj)
     getter star_bases : Array(StarBase)
     getter enemy_ships : Array(EnemyShip)
+    getter enemy_groups : Array(EnemyGroup)
 
     def initialize(window)
       super(:main)
@@ -28,6 +30,7 @@ module Phase::Scene
       @bumpables = [] of HealthObj
       @star_bases = [] of StarBase
       @enemy_ships = [] of EnemyShip
+      @enemy_groups = [] of EnemyGroup
 
       enemies = [] of Enemy
       asteroids = [] of Asteroid
@@ -67,13 +70,19 @@ module Phase::Scene
       @star_bases << StarBase.new(x: 1999, y: 1999)
 
       # enemy ships
+      enemy_group = [] of EnemyShip
       [
-        {x: 600, y: 300}
+        {x: 600, y: 150},
+        {x: 500, y: 100},
+        {x: 400, y: 200}
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        @enemy_ships << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
+        # @enemy_ships << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
+        enemy_group << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
       end
+
+      @enemy_groups << EnemyGroup.new(star_base: @star_bases.first, enemies: enemy_group)
 
       @shootables.concat(enemies).concat(@enemy_ships).concat(asteroids)
       @bumpables.concat(enemies).concat(@enemy_ships).concat(asteroids).concat(star_bases)
@@ -86,7 +95,7 @@ module Phase::Scene
       end
 
       update_bumpables(frame_time)
-
+      enemy_groups.each(&.update(frame_time, @star_bases))
       ship.update(frame_time, keys, mouse, shootables, bumpables)
 
       view.center(ship.x, ship.y)
@@ -98,6 +107,7 @@ module Phase::Scene
       view.set_current
 
       bumpables.each(&.draw(window))
+      enemy_groups.flat_map(&.enemies).each(&.draw(window))
       ship.draw(window)
 
       # default view
