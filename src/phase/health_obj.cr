@@ -105,5 +105,35 @@ module Phase
     def reset_hit
       @hit = false
     end
+
+    def rotation_to(obj : HealthObj)
+      obj.rotation_from(self)
+    end
+
+    def rotation_from(obj : HealthObj)
+      dx = x - obj.x
+      dy = y - obj.y
+
+      if dx == 0
+        if dy > 0
+          return Math::PI / 2
+        elsif dy < 0
+          return -Math::PI / 2
+        else
+          return 0_f64
+        end
+      end
+
+      radians = Math.atan(dy / dx) + (dx < 0 ? Math::PI : 0_f64)
+
+      radians * 180 / Math::PI
+    end
+
+    def distance(obj : HealthObj)
+      dx = x - obj.x
+      dy = y - obj.y
+
+      Math.sqrt(dx * dx + dy * dy) - obj.hit_radius
+    end
   end
 end

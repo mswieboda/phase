@@ -15,6 +15,7 @@ module Phase::Scene
     getter shootables : Array(HealthObj)
     getter bumpables : Array(HealthObj)
     getter star_bases : Array(StarBase)
+    getter enemy_ships : Array(EnemyShip)
 
     def initialize(window)
       super(:main)
@@ -26,6 +27,7 @@ module Phase::Scene
       @shootables = [] of HealthObj
       @bumpables = [] of HealthObj
       @star_bases = [] of StarBase
+      @enemy_ships = [] of EnemyShip
 
       enemies = [] of Enemy
       asteroids = [] of Asteroid
@@ -52,15 +54,6 @@ module Phase::Scene
         enemies << EnemyKamikaze.new(x: x, y: y)
       end
 
-      # enemy ships
-      [
-        {x: 600, y: 300}
-      ].each do |coords|
-        x = coords[:x] * Screen.scaling_factor
-        y = coords[:y] * Screen.scaling_factor
-        enemies << EnemyShip.new(x: x, y: y)
-      end
-
       [
         {x: 1500, y: 975, type: 1},
         {x: 333, y: 1669, type: 2},
@@ -73,8 +66,17 @@ module Phase::Scene
 
       @star_bases << StarBase.new(x: 1999, y: 1999)
 
-      @shootables.concat(enemies).concat(asteroids)
-      @bumpables.concat(enemies).concat(asteroids).concat(star_bases)
+      # enemy ships
+      [
+        {x: 600, y: 300}
+      ].each do |coords|
+        x = coords[:x] * Screen.scaling_factor
+        y = coords[:y] * Screen.scaling_factor
+        @enemy_ships << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
+      end
+
+      @shootables.concat(enemies).concat(@enemy_ships).concat(asteroids)
+      @bumpables.concat(enemies).concat(@enemy_ships).concat(asteroids).concat(star_bases)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
@@ -105,7 +107,13 @@ module Phase::Scene
     end
 
     def update_bumpables(frame_time)
-      bumpables.each(&.update(frame_time))
+      bumpables.each do |bumpable|
+        if bumpable.is_a?(EnemyShip)
+          bumpable.update(frame_time, @star_bases)
+        else
+          bumpable.update(frame_time)
+        end
+      end
 
       bumpables.select(&.remove?).each do |bumpable|
         shootables.delete(bumpable)

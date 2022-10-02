@@ -2,6 +2,7 @@ require "./health_obj"
 
 module Phase
   class Enemy < HealthObj
+    getter rotation : Float32
     getter animations
 
     Sheet = "./assets/enemy.png"
@@ -10,6 +11,8 @@ module Phase
 
     def initialize(x = 0, y = 0, sheet = Sheet)
       super(x, y)
+
+      @rotation = 0
 
       # init animations
       fps = 60
@@ -32,7 +35,7 @@ module Phase
     end
 
     def draw(window : SF::RenderWindow)
-      animations.draw(window, x, y, color: health_color)
+      animations.draw(window, x, y, color: health_color, rotation: rotation)
       draw_hit_circle(window)
     end
 
