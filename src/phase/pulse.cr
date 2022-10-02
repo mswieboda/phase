@@ -40,6 +40,7 @@ module Phase
       @animations = GSF::Animations.new(:pulse, pulse)
       @animations.play(:pulse)
       @fire_sound = SF::Sound.new(FireSound)
+      @fire_sound.volume = 30
     end
 
     def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, shootables : Array(HealthObj))

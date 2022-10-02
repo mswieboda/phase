@@ -27,6 +27,7 @@ module Phase
     getter pulse : Pulse
     getter beam : Beam
     getter super_weapon_timer : Timer
+    getter fire_sound
 
     Speed = 666
     Sheet = "./assets/ship.png"
@@ -38,6 +39,7 @@ module Phase
     SuperWeaponDuration = 10.seconds
     BumpBackFactor = 3
     LaserColor = SF::Color::Green
+    FireSound = SF::SoundBuffer.from_file("./assets/pew.wav")
 
     def initialize(x = 0, y = 0)
       super(x, y)
@@ -98,6 +100,8 @@ module Phase
       }
 
       @fire_timer = Timer.new(FireDuration)
+      @fire_sound = SF::Sound.new(FireSound)
+      @fire_sound.volume = 13
       @lasers = [] of Laser
       @cannon = Cannon.new(x, y)
     end
@@ -253,6 +257,7 @@ module Phase
     end
 
     def fire(mouse_rotation : Float64)
+      fire_sound.play
       @lasers << Laser.new(x, y, mouse_rotation, LaserColor)
     end
 
