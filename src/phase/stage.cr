@@ -10,7 +10,7 @@ module Phase
       super(window)
 
       @start = Scene::Start.new
-      @main = Scene::Main.new
+      @main = Scene::Main.new(window)
 
       @scene = start
     end

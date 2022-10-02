@@ -115,9 +115,11 @@ module Phase
         a.update(frame_time)
       end
 
+      mouse_rotation = mouse.to_rotation(Screen.width / 2, Screen.height / 2)
+
       update_movement(frame_time, keys)
-      update_cannon(frame_time, mouse, enemies)
-      update_super_weapon(frame_time, keys, mouse, enemies)
+      update_cannon(frame_time, mouse, mouse_rotation, enemies)
+      update_super_weapon(frame_time, keys, mouse, mouse_rotation, enemies)
     end
 
     def update_movement(frame_time, keys : Keys)
@@ -139,24 +141,21 @@ module Phase
         dy *= const
       end
 
-      dx = 0_f64 if x + dx < 0
-      dy = 0_f64 if y + dy < 0
-
       move(dx, dy) if dx != 0_f64 || dy != 0_f64
     end
 
-    def update_cannon(frame_time, mouse : Mouse, enemies : Array(Enemy))
-      cannon.update(frame_time, x, y, mouse.to_rotation(x, y))
-      update_firing(mouse)
+    def update_cannon(frame_time, mouse : Mouse, mouse_rotation : Float64, enemies : Array(Enemy))
+      cannon.update(frame_time, x, y, mouse_rotation)
+      update_firing(mouse, mouse_rotation)
       lasers.each(&.update(frame_time, enemies))
       lasers.select(&.remove?).each do |laser|
         lasers.delete(laser)
       end
     end
 
-    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, enemies : Array(Enemy))
+    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, mouse_rotation : Float64, enemies : Array(Enemy))
       pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, enemies)
-      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse.to_rotation(x, y), enemies)
+      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse_rotation, enemies)
 
       if !super_weapon_timer.started? || super_weapon_timer.done?
         super_weapon_timer.restart
@@ -187,18 +186,18 @@ module Phase
       end
     end
 
-    def update_firing(mouse)
+    def update_firing(mouse : Mouse, mouse_rotation : Float64)
       if mouse.pressed?(Mouse::Left)
         if fire_timer.started?
           if fire_timer.done?
-            fire(mouse)
+            fire(mouse_rotation)
 
             fire_timer.restart
           end
         else
           fire_timer.start
 
-          fire(mouse)
+          fire(mouse_rotation)
         end
       else
         fire_timer.stop
@@ -233,8 +232,8 @@ module Phase
       cannon.draw(window)
     end
 
-    def fire(mouse : Mouse)
-      @lasers << Laser.new(x, y, mouse.to_rotation(x, y))
+    def fire(mouse_rotation : Float64)
+      @lasers << Laser.new(x, y, mouse_rotation)
     end
 
     def play_thruster(dir : Symbol)

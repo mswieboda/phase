@@ -6,13 +6,16 @@ require "../asteroid"
 
 module Phase::Scene
   class Main < GSF::Scene
+    getter view : GSF::View
     getter hud
     getter ship
     getter enemies : Array(Enemy)
     getter asteroids : Array(Asteroid)
 
-    def initialize
+    def initialize(window)
       super(:main)
+
+      @view = GSF::View.from_default(window).dup
 
       @ship = Ship.new(x: 750, y: 750)
       @hud = HUD.new(ship)
@@ -64,14 +67,21 @@ module Phase::Scene
       update_enemies(frame_time)
 
       ship.update(frame_time, keys, mouse, enemies)
-
+      view.center(ship.x, ship.y)
       hud.update(frame_time)
     end
 
     def draw(window)
+      # map view
+      view.set_current
+
       enemies.each(&.draw(window))
       ship.draw(window)
       asteroids.each(&.draw(window))
+
+      # default view
+      view.set_default_current
+
       hud.draw(window)
     end
 
