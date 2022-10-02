@@ -19,12 +19,16 @@ module Phase
     end
 
     def mid_x
+      return 0 if enemies.empty?
+
       points = enemies.map(&.x)
 
       points.min + (points.max - points.min) / 2
     end
 
     def mid_y
+      return 0 if enemies.empty?
+
       points = enemies.map(&.y)
 
       points.min + (points.max - points.min) / 2
@@ -39,6 +43,8 @@ module Phase
     end
 
     def update(frame_time, star_bases : Array(StarBase))
+      enemies.each(&.update(frame_time))
+
       target_next_star_base(star_bases)
 
       update_movement(frame_time)

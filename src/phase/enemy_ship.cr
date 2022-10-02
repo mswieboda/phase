@@ -6,30 +6,28 @@ module Phase
     getter star_base_target : StarBase
 
     Sheet = "./assets/enemy.png"
-    Size = 128
-    HitRadius = 64
     RotationSpeed = 100
     TargetFacingThreshold = 3
     TargetDistanceThreshold = 500
     TargetMoveSpeed = 333
 
     def initialize(x, y, star_base : StarBase)
-      super(x, y, Sheet)
+      super(x, y)
 
       @star_base_target = star_base
     end
 
-    def self.hit_radius
-      HitRadius * Screen.scaling_factor
+    def self.sheet
+      Sheet
     end
 
-    def update(frame_time, star_bases : Array(StarBase))
-      super(frame_time)
+    # def update(frame_time, star_bases : Array(StarBase))
+    #   super(frame_time)
 
-      target_next_star_base(star_bases)
+    #   target_next_star_base(star_bases)
 
-      update_movement(frame_time)
-    end
+    #   update_movement(frame_time)
+    # end
 
     def target_next_star_base(star_bases : Array(StarBase))
       if star_base_target.remove?

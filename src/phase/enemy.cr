@@ -9,7 +9,7 @@ module Phase
     SpriteSize = 128
     HitRadius = 64
 
-    def initialize(x = 0, y = 0, sheet = Sheet)
+    def initialize(x = 0, y = 0)
       super(x, y)
 
       @rotation = 0
@@ -19,9 +19,33 @@ module Phase
 
       # idle
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(sheet, 0, 0, SpriteSize, SpriteSize)
+      idle.add(sheet, 0, 0, sprite_width, sprite_height)
 
       @animations = GSF::Animations.new(:idle, idle)
+    end
+
+    def self.sheet
+      Sheet
+    end
+
+    def sheet
+      self.class.sheet
+    end
+
+    def self.sprite_width
+      SpriteSize
+    end
+
+    def sprite_width
+      self.class.sprite_width
+    end
+
+    def self.sprite_height
+      SpriteSize
+    end
+
+    def sprite_height
+      self.class.sprite_height
     end
 
     def self.hit_radius

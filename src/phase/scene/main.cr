@@ -4,6 +4,7 @@ require "../health_obj"
 require "../enemy_static"
 require "../enemy_kamikaze"
 require "../enemy_ship"
+require "../enemy_carrier"
 require "../enemy_group"
 require "../asteroid"
 require "../star_base"
@@ -16,8 +17,8 @@ module Phase::Scene
     getter shootables : Array(HealthObj)
     getter bumpables : Array(HealthObj)
     getter star_bases : Array(StarBase)
-    getter enemy_ships : Array(EnemyShip)
     getter enemy_groups : Array(EnemyGroup)
+    getter enemy_carriers : Array(EnemyCarrier)
 
     def initialize(window)
       super(:main)
@@ -29,7 +30,7 @@ module Phase::Scene
       @shootables = [] of HealthObj
       @bumpables = [] of HealthObj
       @star_bases = [] of StarBase
-      @enemy_ships = [] of EnemyShip
+      @enemy_carriers = [] of EnemyCarrier
       @enemy_groups = [] of EnemyGroup
 
       enemies = [] of Enemy
@@ -78,14 +79,32 @@ module Phase::Scene
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        # @enemy_ships << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
         enemy_group << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
       end
 
       @enemy_groups << EnemyGroup.new(star_base: @star_bases.first, enemies: enemy_group)
 
-      @shootables.concat(enemies).concat(@enemy_ships).concat(asteroids)
-      @bumpables.concat(enemies).concat(@enemy_ships).concat(asteroids).concat(star_bases)
+      # enemy carriers
+      [
+        {x: 900, y: 100}
+      ].each do |coords|
+        x = coords[:x] * Screen.scaling_factor
+        y = coords[:y] * Screen.scaling_factor
+        @enemy_carriers << EnemyCarrier.new(x: x, y: y)
+      end
+
+      @shootables
+        .concat(enemies)
+        .concat(enemy_carriers)
+        .concat(enemy_groups.flat_map(&.enemies))
+        .concat(asteroids)
+
+      @bumpables
+        .concat(enemies)
+        .concat(enemy_carriers)
+        .concat(enemy_groups.flat_map(&.enemies))
+        .concat(asteroids)
+        .concat(star_bases)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
@@ -117,17 +136,19 @@ module Phase::Scene
     end
 
     def update_bumpables(frame_time)
-      bumpables.each do |bumpable|
-        if bumpable.is_a?(EnemyShip)
-          bumpable.update(frame_time, @star_bases)
-        else
-          bumpable.update(frame_time)
-        end
-      end
+      bumpables.each(&.update(frame_time))
 
       bumpables.select(&.remove?).each do |bumpable|
         shootables.delete(bumpable)
         bumpables.delete(bumpable)
+
+        enemy_groups.each do |enemy_group|
+          enemy_group.enemies.delete(bumpable)
+
+          if enemy_group.enemies.empty?
+            enemy_groups.delete(enemy_group)
+          end
+        end
       end
     end
   end
