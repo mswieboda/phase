@@ -3,6 +3,7 @@ require "../hud"
 require "../enemy"
 require "../enemy_kamikaze"
 require "../asteroid"
+require "../star_base"
 
 module Phase::Scene
   class Main < GSF::Scene
@@ -11,6 +12,7 @@ module Phase::Scene
     getter ship
     getter enemies : Array(Enemy)
     getter asteroids : Array(Asteroid)
+    getter star_base : StarBase
 
     def initialize(window)
       super(:main)
@@ -56,6 +58,8 @@ module Phase::Scene
         y = meta[:y] * Screen.scaling_factor
         @asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
+
+      @star_base = StarBase.new(x: 1999, y: 1999)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
@@ -78,6 +82,7 @@ module Phase::Scene
       enemies.each(&.draw(window))
       ship.draw(window)
       asteroids.each(&.draw(window))
+      star_base.draw(window)
 
       # default view
       view.set_default_current
