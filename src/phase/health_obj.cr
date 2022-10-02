@@ -7,6 +7,7 @@ module Phase
     getter health : Int32
     getter? remove
     getter? hit
+    getter hit_sound
 
     Sprite = "./assets/star_base_small.png"
     Size = 900
@@ -16,6 +17,7 @@ module Phase
     DebugHitBox = false
     HitColor = SF::Color::Red
     UnhitColor = SF::Color::White
+    HitSound = SF::SoundBuffer.from_file("./assets/hit.wav")
 
     def initialize(x = 0, y = 0)
       @x = x
@@ -23,6 +25,8 @@ module Phase
       @health = max_health
       @remove = false
       @hit = false
+      @hit_sound = SF::Sound.new(HitSound)
+      @hit_sound.volume = 13
     end
 
     def self.hit_radius
@@ -92,8 +96,9 @@ module Phase
     end
 
     def hit(damage : Int32)
-      @hit = true
+      hit_sound.play
 
+      @hit = true
       @health -= damage
 
       if @health <= 0
