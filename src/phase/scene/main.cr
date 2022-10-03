@@ -22,6 +22,7 @@ module Phase::Scene
     getter game_over_timer : Timer
     getter? restart
     getter score : Int32
+    getter drop_off_targets : Array(NamedTuple(x: Int32, y: Int32))
 
     GameOverWaitDuration = 500.milliseconds
 
@@ -155,14 +156,14 @@ module Phase::Scene
         @star_bases << StarBase.new(x: coords[:x], y: coords[:y])
       end
 
-      drop_off_targets = [
-        {x: 600, y: 800},
-        {x: 485, y: 5500},
-        {x: 9400, y: 3700}
+      @drop_off_targets = [
+        {x: 500, y: 1000},
+        {x: 4500, y: 5000},
+        {x: 8500, y: 2700}
       ]
-      x = drop_off_targets[0][:x]
-      y = drop_off_targets[0][:y]
-      @enemy_carriers << EnemyCarrier.new(x: x, y: y, star_bases: @star_bases, drop_off_targets: drop_off_targets)
+      x = @drop_off_targets[0][:x]
+      y = @drop_off_targets[0][:y]
+      @enemy_carriers << EnemyCarrier.new(x: x, y: y, star_bases: @star_bases, drop_off_targets: @drop_off_targets)
 
       @objs << ship
       @objs
@@ -243,11 +244,31 @@ module Phase::Scene
           end
         end
 
+        if obj.is_a?(EnemyCarrier)
+          enemy_carriers.delete(obj)
+
+          # spawn 2 more carriers, near the drop_off_target
+          drop_off_target = drop_off_targets[3 - star_bases.size]
+
+          2.times do
+            distance = rand(300) + 300
+            theta = rand(Math::PI / 180 * 360)
+
+            x = drop_off_target[:x] + distance * Math.cos(theta)
+            y = drop_off_target[:y] + distance * Math.sin(theta)
+
+            enemy_carrier = EnemyCarrier.new(x: x, y: y, star_bases: star_bases, drop_off_targets: drop_off_targets)
+
+            objs << enemy_carrier
+            enemy_carriers << enemy_carrier
+          end
+        end
+
         if obj.is_a?(StarBase)
           star_bases.delete(obj)
 
           if star_bases.any?
-            @enemy_carriers.each do |carrier|
+            enemy_carriers.each do |carrier|
               carrier.next_dropoff
             end
           end

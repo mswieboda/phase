@@ -1,34 +1,21 @@
 last starbase (only starbase for now)
 	actual location
-{x: 11,700, y: 3,620}
+{x: 11700, y: 3620}
 second starbase
-{x: 6,600, y: 6,400}
+{x: 6600, y: 6400}
 first starbase
-{x: 2,600, y: 2,400}
+{x: 2600, y: 2400}
 
-blockade ships 	{x: 10,900, y:300 + 760*n}
-
-	where n is the number of ships (1 to 10)
-	actual locations:
-{x: 10,800, y: 1060}
-{x: 10,800, y: 1820}
-{x: 10,800, y: 2580}
-{x: 10,800, y: 3340}
-{x: 10,800, y: 4100}
-{x: 10,800, y: 4860}
-{x: 10,800, y: 5620}
-{x: 10,800, y: 6380}
-{x: 10,800, y: 7140}
-{x: 10,800, y: 7900}
+blockade ships 	{x: 10900, y: 300 + 760 * n }
 
 large asteroid
-{x: 12,800, y: 7,200}
+{x: 12800, y: 7200}
 nebula
-{x: 9,050, y: 4,700}
+{x: 9050, y: 4700}
 player start
-{x: 11,150, y: 3,600}
+{x: 1989, y: 1999}
 
 dropoff target
-{x: 800, y: 1280}
-{x: 485, y: 5500}
-{x: 9400, y: 3700}
+{x: 500, y: 1000},
+{x: 4500, y: 5000},
+{x: 8500, y: 2700}
