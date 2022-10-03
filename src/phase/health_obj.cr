@@ -10,9 +10,7 @@ module Phase
     getter hit_sound
     getter? bumped
 
-    Sprite = "./assets/star_base_small.png"
-    Size = 900
-    HitRadius = 450
+    HitRadius = 64
     MaxHealth = 100
     CollisionDamage = 15
     DebugHitBox = false

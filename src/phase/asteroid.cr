@@ -19,6 +19,7 @@ module Phase
       @sprite.position = {x, y}
       @sprite.origin = texture.size / 2.0
       @sprite.rotation = rotation
+      @sprite.scale(Screen.scaling_factor, Screen.scaling_factor)
 
       @remove = false
     end

@@ -229,6 +229,8 @@ module Phase
     end
 
     def draw(window : SF::RenderWindow)
+      super
+
       animations.draw(window, x, y, color: health_color)
 
       [:top, :left, :bottom, :right].each do |dir|
