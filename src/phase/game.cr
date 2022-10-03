@@ -17,7 +17,7 @@ module Phase
         style = SF::Style::Default
       {% end %}
 
-      super(title: "phase", mode: mode, style: SF::Style::Default)
+      super(title: "phase", mode: mode, style: style)
 
       window.framerate_limit = 69
 
