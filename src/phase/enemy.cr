@@ -54,7 +54,7 @@ module Phase
       HitRadius * Screen.scaling_factor
     end
 
-    def update(frame_time)
+    def update(frame_time, bumpables : Array(HealthObj))
       super
 
       animations.update(frame_time)
@@ -65,22 +65,23 @@ module Phase
       draw_hit_circle(window)
     end
 
-    def move(dx : Float64, dy : Float64)
-      @x += dx
-      @y += dy
-    end
-
     def facing?(target_rotation)
       (Calc.shortest_delta(target_rotation, rotation)).abs < FacingRotationThreshold
     end
 
-    def move_forward(speed)
+    def move_forward(speed, bumpables : Array(HealthObj))
       theta = rotation * Math::PI / 180
       dx = speed * Math.cos(theta)
       dy = speed * Math.sin(theta)
 
-      @x += dx
-      @y += dy
+      move(dx, dy)
+
+      bumpables.each do |bumpable|
+        if !bumpable.is_a?(EnemyCarrier) && hit?(bumpable.hit_circle)
+          move(-dx, -dy)
+          bumpable.bump(dx, dy, self, bumpables)
+        end
+      end
     end
 
     def rotate(amount)

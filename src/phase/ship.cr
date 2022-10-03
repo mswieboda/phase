@@ -119,7 +119,7 @@ module Phase
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, shootables : Array(HealthObj), bumpables : Array(HealthObj))
-      super(frame_time)
+      super(frame_time, bumpables)
 
       animations.update(frame_time)
 
@@ -153,17 +153,15 @@ module Phase
         dy *= const
       end
 
-      move(dx, dy)
+      if dx != 0 || dy != 0
+        move_thrust(dx, dy)
 
-      if bumped?(bumpables)
-        move(-dx * BumpBackFactor, -dy * BumpBackFactor)
-      end
-    end
-
-    def bumped?(bumpables : Array(HealthObj))
-      bumpables.any? do |bumpable|
-        if hit?(bumpable.hit_circle)
-          hit(bumpable.collision_damage)
+        bumpables.each do |bumpable|
+          if hit?(bumpable.hit_circle)
+            hit(bumpable.collision_damage)
+            move(-dx * BumpBackFactor, -dy * BumpBackFactor)
+            bumpable.bump(dx * BumpBackFactor, dy * BumpBackFactor, self, bumpables)
+          end
         end
       end
     end
@@ -279,9 +277,8 @@ module Phase
       end
     end
 
-    def move(dx : Float64, dy : Float64)
-      @x += dx
-      @y += dy
+    def move_thrust(dx : Float64, dy : Float64)
+      move(dx, dy)
 
       play_thruster(:top) if dy > 0
       play_thruster(:left) if dx > 0

@@ -46,13 +46,13 @@ module Phase
       mid_y
     end
 
-    def update(frame_time)
-      update_movement(frame_time)
+    def update(frame_time, bumpables : Array(HealthObj))
+      update_movement(frame_time, bumpables)
     end
 
-    def update_movement(frame_time)
+    def update_movement(frame_time, bumpables : Array(HealthObj))
       rotate_to_target(frame_time)
-      move_to_target(frame_time)
+      move_to_target(frame_time, bumpables)
     end
 
     def rotate_to_target(frame_time)
@@ -65,16 +65,16 @@ module Phase
       (Calc.shortest_delta(target_rotation, rotation)).abs < FacingRotationThreshold
     end
 
-    def move_to_target(frame_time)
+    def move_to_target(frame_time, bumpables : Array(HealthObj))
       target_distance = distance(star_base_target)
 
       unless target_distance.abs < TargetDistanceThreshold
-        move_forward(TargetMoveSpeed * frame_time)
+        move_forward(TargetMoveSpeed * frame_time, bumpables)
       end
     end
 
-    def move_forward(speed)
-      enemies.each(&.move_forward(speed))
+    def move_forward(speed, bumpables : Array(HealthObj))
+      enemies.each(&.move_forward(speed, bumpables))
     end
 
     def rotate(amount)

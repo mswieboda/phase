@@ -65,7 +65,7 @@ module Phase
       hit? ? HitColor : unhit_color
     end
 
-    def update(frame_time)
+    def update(frame_time, bumpables : Array(HealthObj))
       reset_hit
     end
 
@@ -85,6 +85,26 @@ module Phase
       circle.position = {hc.x, hc.y}
 
       window.draw(circle)
+    end
+
+    def move(dx : Float64, dy : Float64)
+      @x += dx
+      @y += dy
+    end
+
+    def bump(dx, dy, bumped_by, bumpables)
+      move(dx, dy)
+
+      bumpables.each do |bumpable|
+        next if bumpable == self
+        next if bumpable == bumped_by
+        next if bumpable.is_a?(EnemyCarrier)
+
+        if hit?(bumpable.hit_circle)
+          move(-dx, -dy)
+          bumpable.bump(dx, dy, self, bumpables)
+        end
+      end
     end
 
     def hit_circle

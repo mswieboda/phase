@@ -55,12 +55,12 @@ module Phase
       MaxHealth
     end
 
-    def update(frame_time)
-      super(frame_time)
+    def update(frame_time, bumpables : Array(HealthObj))
+      super(frame_time, bumpables)
 
       if distance(target_x, target_y).abs > DropOffDistanceThreshold
         rotate_to_target(frame_time)
-        move_forward(move_speed * frame_time)
+        move_forward(move_speed * frame_time, bumpables)
       elsif dropped_off?
         @remove = true
       elsif !facing?(drop_off_target_rotation)
@@ -103,6 +103,18 @@ module Phase
       end
 
       @enemy_group = EnemyGroup.new(star_bases: star_bases, enemies: enemies)
+    end
+
+    def move_forward(speed, bumpables : Array(HealthObj))
+      theta = rotation * Math::PI / 180
+      dx = speed * Math.cos(theta)
+      dy = speed * Math.sin(theta)
+
+      move(dx, dy)
+    end
+
+    def bump(dx, dy, bumped_by, bumpables)
+      bumped_by.move(-dx, -dy) unless bumped_by.is_a?(Enemy)
     end
 
     def finish_drop_off

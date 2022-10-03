@@ -40,7 +40,6 @@ module Phase::Scene
       [
         {x: 500, y: 700},
         {x: 300, y: 900},
-        {x: 900, y: 100},
         {x: 1500, y: 1500}
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
@@ -117,7 +116,7 @@ module Phase::Scene
 
       update_bumpables(frame_time)
       update_enemy_carriers
-      enemy_groups.each(&.update(frame_time))
+      enemy_groups.each(&.update(frame_time, bumpables))
       ship.update(frame_time, keys, mouse, shootables, bumpables)
 
       view.center(ship.x, ship.y)
@@ -139,7 +138,7 @@ module Phase::Scene
     end
 
     def update_bumpables(frame_time)
-      bumpables.each(&.update(frame_time))
+      bumpables.each(&.update(frame_time, bumpables))
 
       bumpables.select(&.remove?).each do |bumpable|
         shootables.delete(bumpable)
