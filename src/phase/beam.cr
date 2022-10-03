@@ -11,7 +11,7 @@ module Phase
 
     SpriteSegment = "./assets/beam.png"
     SpriteTip = "./assets/beam_tip.png"
-    Damage = 30
+    Damage = 10
     Duration = 1337.milliseconds
     MaxDistance = 3333
     SegmentWidth = 8
@@ -48,7 +48,7 @@ module Phase
       SegmentHeight
     end
 
-    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, shootables : Array(HealthObj))
+    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, objs : Array(HealthObj))
       move(x, y, rotation)
 
       @firing = false if firing? && duration_timer.done?
@@ -60,8 +60,12 @@ module Phase
       end
 
       if firing?
-        shootables.each do |shootable|
-          shootable.hit(Damage) if hit?(shootable.hit_circle)
+        objs.each do |obj|
+          next if obj.is_a?(Ship)
+          next if obj.is_a?(StarBase)
+          next if obj.is_a?(Asteroid)
+
+          obj.hit(Damage) if hit?(obj.hit_circle)
         end
       end
     end

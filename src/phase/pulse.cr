@@ -43,7 +43,7 @@ module Phase
       @fire_sound.volume = 30
     end
 
-    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, shootables : Array(HealthObj))
+    def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, objs : Array(HealthObj))
       move(x, y) unless firing?
 
       animations.update(frame_time)
@@ -58,8 +58,12 @@ module Phase
       end
 
       if firing?
-        shootables.each do |shootable|
-          shootable.hit(Damage) if hit?(shootable.hit_circle)
+        objs.each do |obj|
+          next if obj.is_a?(Ship)
+          next if obj.is_a?(StarBase)
+          next if obj.is_a?(Asteroid)
+
+          obj.hit(Damage) if hit?(obj.hit_circle)
         end
       end
     end

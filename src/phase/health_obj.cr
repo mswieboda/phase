@@ -12,7 +12,7 @@ module Phase
 
     HitRadius = 64
     MaxHealth = 100
-    CollisionDamage = 5
+    CollisionDamage = 1
     DebugHitBox = false
     HitColor = SF::Color::Red
     UnhitColor = SF::Color::White

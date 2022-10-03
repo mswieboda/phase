@@ -131,8 +131,8 @@ module Phase::Scene
         end
       end
 
-      ship.update(frame_time, keys, mouse, objs)
       update_objs(frame_time)
+      ship.update(frame_time, keys, mouse, objs)
       add_lasers
       update_lasers(frame_time)
       update_enemy_carriers
@@ -156,7 +156,11 @@ module Phase::Scene
     end
 
     def update_objs(frame_time)
-      objs.each(&.update(frame_time, objs))
+      objs.each do |obj|
+        next if obj == ship
+
+        obj.update(frame_time, objs)
+      end
 
       objs.select(&.remove?).each do |obj|
         objs.delete(obj)
@@ -201,6 +205,10 @@ module Phase::Scene
         if laser = enemy_ship.laser
           @lasers << laser
         end
+      end
+
+      if laser = ship.laser
+        @lasers << laser
       end
     end
 

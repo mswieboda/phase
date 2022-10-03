@@ -20,7 +20,6 @@ module Phase
     getter animations
     getter thrusters : ThrusterAnimationsTuple
     getter fire_timer : Timer
-    getter lasers : Array(Laser)
     getter cannon : Cannon
     getter super_weapon : SuperWeapon
     getter super_weapons : Array(SuperWeapon)
@@ -28,6 +27,7 @@ module Phase
     getter beam : Beam
     getter super_weapon_timer : Timer
     getter fire_sound
+    getter laser : Laser?
 
     Speed = 666
     Sheet = "./assets/ship.png"
@@ -101,8 +101,8 @@ module Phase
       @fire_timer = Timer.new(FireDuration)
       @fire_sound = SF::Sound.new(FireSound)
       @fire_sound.volume = 100
-      @lasers = [] of Laser
       @cannon = Cannon.new(x, y)
+      @laser = nil
     end
 
     def self.size
@@ -120,6 +120,8 @@ module Phase
     def update(frame_time, keys : Keys, mouse : Mouse, objs : Array(HealthObj))
       super(frame_time, objs)
 
+      @laser = nil
+
       animations.update(frame_time)
 
       thrusters[:animations].each do |dir, a|
@@ -129,13 +131,8 @@ module Phase
       mouse_rotation = mouse.to_rotation(Screen.width / 2, Screen.height / 2)
 
       update_movement(frame_time, keys, objs)
-
-      shootable_objs = objs.select do |obj|
-        !obj.is_a?(Ship) && !obj.is_a?(StarBase)
-      end
-
-      update_cannon(frame_time, mouse, mouse_rotation, shootable_objs)
-      update_super_weapon(frame_time, keys, mouse, mouse_rotation, shootable_objs)
+      update_cannon(frame_time, mouse, mouse_rotation, objs)
+      update_super_weapon(frame_time, keys, mouse, mouse_rotation, objs)
     end
 
     def update_movement(frame_time, keys : Keys, objs : Array(HealthObj))
@@ -183,18 +180,14 @@ module Phase
       end
     end
 
-    def update_cannon(frame_time, mouse : Mouse, mouse_rotation : Float64, shootables : Array(HealthObj))
+    def update_cannon(frame_time, mouse : Mouse, mouse_rotation : Float64, objs : Array(HealthObj))
       cannon.update(frame_time, x, y, mouse_rotation)
       update_firing(mouse, mouse_rotation)
-      lasers.each(&.update(frame_time, shootables))
-      lasers.select(&.remove?).each do |laser|
-        lasers.delete(laser)
-      end
     end
 
-    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, mouse_rotation : Float64, shootables : Array(HealthObj))
-      pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, shootables)
-      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse_rotation, shootables)
+    def update_super_weapon(frame_time, keys : Keys, mouse : Mouse, mouse_rotation : Float64, objs : Array(HealthObj))
+      pulse.update(frame_time, super_weapon == pulse, super_weapon_timer.done?, x, y, objs)
+      beam.update(frame_time, super_weapon == beam, super_weapon_timer.done?, x, y, mouse_rotation, objs)
 
       if !super_weapon_timer.started? || super_weapon_timer.done?
         super_weapon_timer.restart
@@ -268,7 +261,6 @@ module Phase
         end
       end
 
-      lasers.each(&.draw(window))
       super_weapons.each(&.draw(window))
       cannon.draw(window)
     end
@@ -276,7 +268,8 @@ module Phase
     def fire(mouse_rotation : Float64)
       fire_sound.pitch = rand(0.10) + 0.95
       fire_sound.play
-      @lasers << Laser.new(x, y, mouse_rotation)
+
+      @laser = Laser.new(x, y, mouse_rotation)
     end
 
     def play_thruster(dir : Symbol)
