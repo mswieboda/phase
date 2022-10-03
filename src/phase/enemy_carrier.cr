@@ -26,6 +26,7 @@ module Phase
     MinNewDropOffDistance = 300
     MaxNewDropOffDistance = 500
     DropOffWaitDuration = 3.seconds
+    ScoreValue = 50
 
     def initialize(x, y, target_x, target_y, star_bases, group_size = 3)
       super(x, y)
@@ -57,6 +58,10 @@ module Phase
 
     def self.max_health
       MaxHealth
+    end
+
+    def self.score_value
+      ScoreValue
     end
 
     def update(frame_time, objs : Array(HealthObj))
