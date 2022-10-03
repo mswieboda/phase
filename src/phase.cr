@@ -1,5 +1,6 @@
 require "game_sf"
 
+require "./phase/calc"
 require "./phase/game"
 
 module Phase

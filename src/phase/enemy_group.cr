@@ -4,7 +4,7 @@ require "./star_base"
 module Phase
   class EnemyGroup
     getter rotation : Float32
-    getter star_base_target : StarBase
+    getter star_bases : Array(StarBase)
     getter enemies : Array(EnemyShip)
 
     RotationSpeed = 100
@@ -12,10 +12,14 @@ module Phase
     TargetDistanceThreshold = 500
     TargetMoveSpeed = 333
 
-    def initialize(star_base : StarBase, enemies = [] of EnemyShip)
+    def initialize(star_bases, enemies = [] of EnemyShip)
       @rotation = 0
-      @star_base_target = star_base
+      @star_bases = star_bases
       @enemies = enemies
+    end
+
+    def star_base_target
+      star_bases.first
     end
 
     def mid_x
@@ -42,18 +46,8 @@ module Phase
       mid_y
     end
 
-    def update(frame_time, star_bases : Array(StarBase))
-      enemies.each(&.update(frame_time))
-
-      target_next_star_base(star_bases)
-
+    def update(frame_time)
       update_movement(frame_time)
-    end
-
-    def target_next_star_base(star_bases : Array(StarBase))
-      if star_base_target.remove?
-        star_base_target = star_bases.first
-      end
     end
 
     def update_movement(frame_time)
@@ -68,7 +62,7 @@ module Phase
     end
 
     def facing?(target_rotation)
-      (target_rotation - rotation).abs < FacingRotationThreshold
+      (Calc.shortest_delta(target_rotation, rotation)).abs < FacingRotationThreshold
     end
 
     def move_to_target(frame_time)
@@ -85,17 +79,28 @@ module Phase
 
     def rotate(amount)
       @rotation += amount
+
+      if @rotation >= 360
+        @rotation -= 360
+      elsif @rotation < 0
+        @rotation += 360
+      end
+
       enemies.each(&.rotate(amount))
     end
 
     def rotate_towards(target_rotation, rotation_speed)
-      sign = target_rotation >= rotation ? 1 : -1
-      amount = sign * rotation_speed
+      delta = Calc.shortest_delta(target_rotation, rotation)
+      amount = delta.sign * rotation_speed
 
-      if (sign > 0 && rotation + amount > target_rotation) || (sign < 0 && rotation - amount < target_rotation)
+      orig_rotation = rotation
+
+      rotate(amount)
+
+      if delta.sign > 0 && amount > delta
         @rotation = target_rotation.to_f32
-      else
-        rotate(amount)
+      elsif delta.sign < 0 && amount < delta
+        @rotation = target_rotation.to_f32
       end
     end
 
@@ -104,10 +109,7 @@ module Phase
     end
 
     def distance(obj : HealthObj)
-      dx = x - obj.x
-      dy = y - obj.y
-
-      Math.sqrt(dx * dx + dy * dy) - obj.hit_radius
+      Calc.distance(x, y, obj.x, obj.y) - obj.hit_radius
     end
   end
 end

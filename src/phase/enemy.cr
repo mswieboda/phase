@@ -71,7 +71,7 @@ module Phase
     end
 
     def facing?(target_rotation)
-      (target_rotation - rotation).abs < FacingRotationThreshold
+      (Calc.shortest_delta(target_rotation, rotation)).abs < FacingRotationThreshold
     end
 
     def move_forward(speed)
@@ -85,16 +85,26 @@ module Phase
 
     def rotate(amount)
       @rotation += amount
+
+      if @rotation >= 360
+        @rotation -= 360
+      elsif @rotation < 0
+        @rotation += 360
+      end
     end
 
     def rotate_towards(target_rotation, rotation_speed)
-      sign = target_rotation >= rotation ? 1 : -1
-      amount = sign * rotation_speed
+      delta = Calc.shortest_delta(target_rotation, rotation)
+      amount = delta.sign * rotation_speed
 
-      if (sign > 0 && rotation + amount > target_rotation) || (sign < 0 && rotation - amount < target_rotation)
+      orig_rotation = rotation
+
+      rotate(amount)
+
+      if delta.sign > 0 && amount > delta
         @rotation = target_rotation.to_f32
-      else
-        rotate(amount)
+      elsif delta.sign < 0 && amount < delta
+        @rotation = target_rotation.to_f32
       end
     end
   end

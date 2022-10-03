@@ -79,20 +79,20 @@ module Phase::Scene
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        enemy_group << EnemyShip.new(x: x, y: y, star_base: @star_bases.first)
+        enemy_group << EnemyShip.new(x: x, y: y)
       end
 
-      @enemy_groups << EnemyGroup.new(star_base: @star_bases.first, enemies: enemy_group)
+      @enemy_groups << EnemyGroup.new(star_bases: @star_bases, enemies: enemy_group)
 
       # enemy carriers
       [
-        {x: 0, y: 0, drop_off_x: 900, drop_off_y: 100}
+        {x: 0, y: 1000, target_x: 900, target_y: 100}
       ].each do |coords|
         x = coords[:x] * Screen.scaling_factor
         y = coords[:y] * Screen.scaling_factor
-        drop_off_x = coords[:drop_off_x] * Screen.scaling_factor
-        drop_off_y = coords[:drop_off_y] * Screen.scaling_factor
-        @enemy_carriers << EnemyCarrier.new(x: x, y: y, drop_off_x: drop_off_x, drop_off_y: drop_off_y)
+        target_x = coords[:target_x] * Screen.scaling_factor
+        target_y = coords[:target_y] * Screen.scaling_factor
+        @enemy_carriers << EnemyCarrier.new(x: x, y: y, target_x: target_x, target_y: target_y, star_bases: @star_bases)
       end
 
       @shootables
@@ -116,7 +116,8 @@ module Phase::Scene
       end
 
       update_bumpables(frame_time)
-      enemy_groups.each(&.update(frame_time, @star_bases))
+      update_enemy_carriers
+      enemy_groups.each(&.update(frame_time))
       ship.update(frame_time, keys, mouse, shootables, bumpables)
 
       view.center(ship.x, ship.y)
@@ -128,7 +129,7 @@ module Phase::Scene
       view.set_current
 
       bumpables.each(&.draw(window))
-      enemy_groups.flat_map(&.enemies).each(&.draw(window))
+      # enemy_groups.flat_map(&.enemies).each(&.draw(window))
       ship.draw(window)
 
       # default view
@@ -150,6 +151,19 @@ module Phase::Scene
           if enemy_group.enemies.empty?
             enemy_groups.delete(enemy_group)
           end
+        end
+      end
+    end
+
+    def update_enemy_carriers
+      enemy_carriers.each do |enemy_carrier|
+        if enemy_group = enemy_carrier.enemy_group
+          @enemy_groups << enemy_group
+
+          @shootables.concat(enemy_group.enemies)
+          @bumpables.concat(enemy_group.enemies)
+
+          enemy_carrier.finish_drop_off
         end
       end
     end

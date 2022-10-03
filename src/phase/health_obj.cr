@@ -112,7 +112,9 @@ module Phase
     end
 
     def rotation_to(other_x, other_y)
-      rotation_from(other_x, other_y) - 180
+      target_rotation = rotation_from(other_x, other_y) + 180
+
+      target_rotation < 360 ? target_rotation : target_rotation - 360
     end
 
     def rotation_to(obj : HealthObj)
@@ -127,19 +129,21 @@ module Phase
       dx = x - other_x
       dy = y - other_y
 
+      radians = 0
+
       if dx == 0
         if dy > 0
-          return Math::PI / 2
+          radians = Math::PI / 2
         elsif dy < 0
-          return -Math::PI / 2
-        else
-          return 0_f64
+          radians = 3 * Math::PI / 2
         end
+      else
+        radians = Math.atan(dy / dx) + (dx < 0 ? Math::PI : 0)
       end
 
-      radians = Math.atan(dy / dx) + (dx < 0 ? Math::PI : 0_f64)
+      target_rotation = radians * 180 / Math::PI
 
-      radians * 180 / Math::PI
+      target_rotation < 360 ? target_rotation : target_rotation - 360
     end
 
     def distance(obj : HealthObj)
@@ -147,10 +151,7 @@ module Phase
     end
 
     def distance(cx, cy, radius = 0)
-      dx = x - cx
-      dy = y - cy
-
-      Math.sqrt(dx * dx + dy * dy) - radius
+      Calc.distance(x, y, cx, cy) - radius
     end
   end
 end
