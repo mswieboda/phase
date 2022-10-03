@@ -13,7 +13,7 @@ module Phase
     Sheet = "./assets/carrier.png"
     SpriteWidth = 384
     SpriteHeight = 256
-    HitRadius = 128
+    HitRadius = 160
     MaxHealth = 1500
 
     # carrier drop off
@@ -138,6 +138,8 @@ module Phase
       objs.each do |obj|
         next if obj.is_a?(Enemy)
         next if obj.is_a?(Asteroid)
+        next if obj.is_a?(BlockadeShip)
+        next if obj.is_a?(StarBase)
 
         if hit?(obj.hit_circle)
           move(-dx, -dy)

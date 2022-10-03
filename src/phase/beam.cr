@@ -64,6 +64,7 @@ module Phase
           next if obj.is_a?(Ship)
           next if obj.is_a?(StarBase)
           next if obj.is_a?(Asteroid)
+          next if obj.is_a?(BlockadeShip)
 
           obj.hit(Damage) if hit?(obj.hit_circle)
         end

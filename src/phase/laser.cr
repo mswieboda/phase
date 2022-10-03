@@ -93,6 +93,7 @@ module Phase
         else
           next if shootable.is_a?(Ship)
           next if shootable.is_a?(StarBase)
+          next if shootable.is_a?(BlockadeShip)
         end
 
         if hit?(shootable.hit_circle)
