@@ -19,6 +19,10 @@ module Phase::Scene
     getter enemy_groups : Array(EnemyGroup)
     getter enemy_carriers : Array(EnemyCarrier)
     getter lasers : Array(Laser)
+    getter game_over_timer : Timer
+    getter? restart
+
+    GameOverWaitDuration = 500.milliseconds
 
     def initialize(window)
       super(:main)
@@ -29,6 +33,9 @@ module Phase::Scene
 
       @ship = Ship.new(x: 1000, y: 1000)
       @hud = HUD.new(ship)
+      @game_over_timer = Timer.new(GameOverWaitDuration)
+      @restart = false
+
       @objs = [] of HealthObj
       @star_bases = [] of StarBase
       @enemy_carriers = [] of EnemyCarrier
@@ -69,7 +76,7 @@ module Phase::Scene
         asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
 
-      @star_bases << StarBase.new(x: 3999, y: 3999)
+      @star_bases << StarBase.new(x: 1999, y: 1999)
 
       # enemy ships
       enemy_group = [] of EnemyShip
@@ -111,15 +118,28 @@ module Phase::Scene
         return
       end
 
-      ship.update(frame_time, keys, mouse, objs)
+      if keys.just_pressed?(Keys::Enter)
+        @restart = true
+      end
+
+      if game_over?
+        if game_over_timer.done?
+          hud.update(frame_time, game_over?, game_over_message)
+          return
+        else
+          game_over_timer.start unless game_over_timer.started?
+        end
+      end
+
       update_objs(frame_time)
+      ship.update(frame_time, keys, mouse, objs)
       add_lasers
       update_lasers(frame_time)
       update_enemy_carriers
       enemy_groups.each(&.update(frame_time, objs))
 
       view.center(ship.x, ship.y)
-      hud.update(frame_time)
+      hud.update(frame_time, false, nil)
     end
 
     def draw(window)
@@ -136,7 +156,11 @@ module Phase::Scene
     end
 
     def update_objs(frame_time)
-      objs.each(&.update(frame_time, objs))
+      objs.each do |obj|
+        next if obj == ship
+
+        obj.update(frame_time, objs)
+      end
 
       objs.select(&.remove?).each do |obj|
         objs.delete(obj)
@@ -149,6 +173,10 @@ module Phase::Scene
               enemy_groups.delete(enemy_group)
             end
           end
+        end
+
+        if obj.is_a?(StarBase)
+          star_bases.delete(obj)
         end
       end
     end
@@ -177,6 +205,24 @@ module Phase::Scene
         if laser = enemy_ship.laser
           @lasers << laser
         end
+      end
+
+      if laser = ship.laser
+        @lasers << laser
+      end
+    end
+
+    def game_over?
+      star_bases.empty? || ship.remove?
+    end
+
+    def game_over_message
+      if ship.remove?
+        "you were destroyed"
+      elsif star_bases.empty?
+        "star bases were destroyed"
+      else
+        nil
       end
     end
   end

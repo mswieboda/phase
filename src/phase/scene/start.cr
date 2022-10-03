@@ -2,6 +2,7 @@ module Phase::Scene
   class Start < GSF::Scene
     getter title : SF::Text
     getter start_scene : Symbol?
+    getter? continue
     getter items
 
     TitleTextColor = SF::Color::Green
@@ -10,9 +11,10 @@ module Phase::Scene
       super(:start)
 
       @start_scene = nil
+      @continue = false
       @items = GSF::MenuItems.new(
         font: Font.default,
-        labels: ["start", "exit"],
+        labels: ["new", "continue", "exit"],
         size: (36 * Screen.scaling_factor).to_i
       )
 
@@ -29,6 +31,7 @@ module Phase::Scene
       super
 
       @start_scene = nil
+      @continue = false
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
@@ -38,8 +41,10 @@ module Phase::Scene
       #       with defined input config per scene
       if keys.just_pressed?([Keys::Space, Keys::Enter])
         case items.focused
-        when "start"
+        when "new"
           @start_scene = :main
+        when "continue"
+          @continue = true
         when "exit"
           @exit = true
         end
