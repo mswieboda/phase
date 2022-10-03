@@ -35,6 +35,10 @@ module Phase
       draw_hit_circle(window)
     end
 
+    def static?
+      true
+    end
+
     def bump(dx, dy, bumped_by, bumpables)
       bumped_by.move(-dx, -dy)
     end

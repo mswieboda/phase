@@ -161,8 +161,19 @@ module Phase
 
           if hit?(bumpable.hit_circle)
             hit(bumpable.collision_damage)
-            move(-dx * BumpBackFactor, -dy * BumpBackFactor)
-            bumpable.bump(dx * BumpBackFactor, dy * BumpBackFactor, self, bumpables)
+
+            bx = x - bumpable.x
+            by = y - bumpable.y
+            bx = bx.zero? ? 0 : bx / bx.abs
+            by = by.zero? ? 0 : by / by.abs
+            bx = (bx * BumpBackFactor).to_f64
+            by = (by * BumpBackFactor).to_f64
+
+            move(-dx + bx, -dy + by)
+
+            unless bumpable.static?
+              bumpable.bump(dx * BumpBackFactor, dy * BumpBackFactor, self, bumpables)
+            end
           end
         end
       end

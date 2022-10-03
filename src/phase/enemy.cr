@@ -10,6 +10,7 @@ module Phase
     HitRadius = 64
     FacingRotationThreshold = 0.1_f32
     RotationSpeed = 100
+    BumpBackFactor = 3
 
     def initialize(x = 0, y = 0, rotation = 0)
       super(x, y)
@@ -78,8 +79,18 @@ module Phase
 
       bumpables.each do |bumpable|
         if !bumpable.is_a?(EnemyCarrier) && hit?(bumpable.hit_circle)
-          move(-dx, -dy)
-          bumpable.bump(dx, dy, self, bumpables)
+          bx = x - bumpable.x
+          by = y - bumpable.y
+          bx = bx.zero? ? 0 : bx / bx.abs
+          by = by.zero? ? 0 : by / by.abs
+          bx = (bx * BumpBackFactor).to_f64
+          by = (by * BumpBackFactor).to_f64
+
+          move(bx, by)
+
+          unless bumpable.static?
+            bumpable.bump(bx, by, self, bumpables)
+          end
         end
       end
     end

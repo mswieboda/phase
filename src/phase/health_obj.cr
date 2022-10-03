@@ -92,6 +92,10 @@ module Phase
       @y += dy
     end
 
+    def static?
+      false
+    end
+
     def bump(dx, dy, bumped_by, bumpables)
       return if bumped?
 
