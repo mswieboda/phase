@@ -34,7 +34,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius #* Screen.scaling_factor
+      HitRadius
     end
 
     def hit_radius
@@ -58,7 +58,7 @@ module Phase
     end
 
     def update_movement(frame_time)
-      speed = Speed * frame_time #* Screen.scaling_factor
+      speed = Speed * frame_time
       theta = rotation * Math::PI / 180
 
       @x += speed * Math.cos(theta)
@@ -80,7 +80,7 @@ module Phase
     end
 
     def check_distance
-      fade_remove if distance > MaxDistance #* Screen.scaling_factor
+      fade_remove if distance > MaxDistance
     end
 
     def check_shootables(shootables : Array(HealthObj))

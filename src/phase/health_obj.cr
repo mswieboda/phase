@@ -30,7 +30,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius #* Screen.scaling_factor
+      HitRadius
     end
 
     def hit_radius

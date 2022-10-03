@@ -4,7 +4,7 @@ module Phase
   class Game < GSF::Game
     getter manager
 
-    DebugVideoModes = false
+    DebugVideoModes = true
 
     def initialize
       mode = SF::VideoMode.desktop_mode
@@ -17,10 +17,9 @@ module Phase
         style = SF::Style::Default
       {% end %}
 
-      super(title: "phase", mode: mode, style: style) #, default_height: 2100)
+      super(title: "phase", mode: mode, style: style)
 
       window.framerate_limit = 69
-      # window.default_view.zoom(Screen.scaling_factor)
 
       if DebugVideoModes
         puts ">>> SF::VideoMode.fullscreen_modes:"

@@ -17,13 +17,12 @@ module Phase
       @sprite = SF::Sprite.new(texture)
       @sprite.position = {x, y}
       @sprite.origin = texture.size / 2.0
-      # @sprite.scale(Screen.scaling_factor, Screen.scaling_factor)
 
       @remove = false
     end
 
     def self.hit_radius
-      HitRadius #* Screen.scaling_factor
+      HitRadius
     end
 
     def self.max_health

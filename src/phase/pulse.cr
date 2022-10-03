@@ -103,8 +103,8 @@ module Phase
       display_frame = animations.display_frame
 
       {
-        outer: OuterRadii[display_frame], #* Screen.scaling_factor,
-        inner: InnerRadii[display_frame], #* Screen.scaling_factor
+        outer: OuterRadii[display_frame],
+        inner: InnerRadii[display_frame],
       }
     end
 

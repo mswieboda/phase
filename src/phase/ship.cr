@@ -107,7 +107,7 @@ module Phase
     end
 
     def self.size
-      ShipSize #* Screen.scaling_factor
+      ShipSize
     end
 
     def size
@@ -115,7 +115,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius #* Screen.scaling_factor
+      HitRadius
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, shootables : Array(HealthObj), bumpables : Array(HealthObj))
@@ -137,7 +137,7 @@ module Phase
     def update_movement(frame_time, keys : Keys, bumpables : Array(HealthObj))
       dx = 0_f64
       dy = 0_f64
-      speed = Speed * frame_time #* Screen.scaling_factor
+      speed = Speed * frame_time
 
       dy -= speed if keys.pressed?(Keys::W)
       dx -= speed if keys.pressed?(Keys::A)
@@ -240,13 +240,13 @@ module Phase
 
           case dir
           when :top
-            draw_y = draw_y - size / 2 - ThrusterSize / 2 #* Screen.scaling_factor
+            draw_y = draw_y - size / 2 - ThrusterSize / 2
           when :left
-            draw_x = draw_x - size / 2 - ThrusterSize / 2 #* Screen.scaling_factor
+            draw_x = draw_x - size / 2 - ThrusterSize / 2
           when :bottom
-            draw_y = draw_y + size / 2 + ThrusterSize / 2 #* Screen.scaling_factor
+            draw_y = draw_y + size / 2 + ThrusterSize / 2
           when :right
-            draw_x = draw_x + size / 2 + ThrusterSize / 2 #* Screen.scaling_factor
+            draw_x = draw_x + size / 2 + ThrusterSize / 2
           end
 
           thrusters[:animations][dir].draw(window, draw_x, draw_y)
