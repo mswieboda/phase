@@ -47,27 +47,6 @@ module Phase::Scene
       enemies = [] of Enemy
       asteroids = [] of Asteroid
 
-      # enemies (static)
-      [
-        {x: 500, y: 700},
-        {x: 300, y: 900},
-        {x: 1500, y: 1500}
-      ].each do |coords|
-        x = coords[:x]
-        y = coords[:y]
-        enemies << EnemyStatic.new(x: x, y: y)
-      end
-
-      # kamikaze enemies
-      [
-        {x: 100, y: 300},
-        {x: 300, y: 300}
-      ].each do |coords|
-        x = coords[:x]
-        y = coords[:y]
-        enemies << EnemyKamikaze.new(x: x, y: y)
-      end
-
       # asteroids
       [
         {x: 4900, y: 200},
@@ -176,30 +155,14 @@ module Phase::Scene
         @star_bases << StarBase.new(x: coords[:x], y: coords[:y])
       end
 
-      # enemy ships
-      enemy_group = [] of EnemyShip
-      [
-        {x: 600, y: 150},
-        {x: 500, y: 100},
-        {x: 400, y: 200}
-      ].each do |coords|
-        x = coords[:x]
-        y = coords[:y]
-        enemy_group << EnemyShip.new(x: x, y: y)
-      end
-
-      @enemy_groups << EnemyGroup.new(star_bases: @star_bases, enemies: enemy_group)
-
-      # enemy carriers
-      [
-        {x: 0, y: 1000, target_x: 900, target_y: 100}
-      ].each do |coords|
-        x = coords[:x]
-        y = coords[:y]
-        target_x = coords[:target_x]
-        target_y = coords[:target_y]
-        @enemy_carriers << EnemyCarrier.new(x: x, y: y, target_x: target_x, target_y: target_y, star_bases: @star_bases)
-      end
+      drop_off_targets = [
+        {x: 600, y: 800},
+        {x: 485, y: 5500},
+        {x: 9400, y: 3700}
+      ]
+      x = drop_off_targets[0][:x]
+      y = drop_off_targets[0][:y]
+      @enemy_carriers << EnemyCarrier.new(x: x, y: y, star_bases: @star_bases, drop_off_targets: drop_off_targets)
 
       @objs << ship
       @objs
@@ -282,6 +245,12 @@ module Phase::Scene
 
         if obj.is_a?(StarBase)
           star_bases.delete(obj)
+
+          if star_bases.any?
+            @enemy_carriers.each do |carrier|
+              carrier.next_dropoff
+            end
+          end
         end
       end
     end

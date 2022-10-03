@@ -6,15 +6,15 @@ module Phase
     getter target_x : Float64
     getter target_y : Float64
     getter star_bases : Array(StarBase)
-    getter group_size : Int32
     getter enemy_group : EnemyGroup?
     getter drop_off_timer : Timer
+    getter drop_off_targets : Array(NamedTuple(x: Int32, y: Int32))
 
     Sheet = "./assets/carrier.png"
     SpriteWidth = 384
     SpriteHeight = 256
     HitRadius = 128
-    MaxHealth = 1000
+    MaxHealth = 1500
 
     # carrier drop off
     RotationSpeed = 33
@@ -27,17 +27,21 @@ module Phase
     MaxNewDropOffDistance = 500
     DropOffWaitDuration = 3.seconds
     ScoreValue = 50
+    MinGroupSize = 2
+    MaxGroupSize = 6
 
-    def initialize(x, y, target_x, target_y, star_bases, group_size = 3)
+    def initialize(x, y, star_bases, drop_off_targets)
       super(x, y)
 
       @initial_x = x
-      @target_x = target_x
-      @target_y = target_y
+      @target_x = 0
+      @target_y = 0
       @star_bases = star_bases
-      @group_size = group_size
+      @drop_off_targets = drop_off_targets
       @enemy_group = nil
       @drop_off_timer = Timer.new(DropOffWaitDuration)
+
+      new_target
     end
 
     def self.sheet
@@ -106,6 +110,8 @@ module Phase
       mid_x = x + distance * Math.cos(theta)
       mid_y = y + distance * Math.sin(theta)
 
+      group_size = rand(MaxGroupSize - MinGroupSize) + MinGroupSize
+
       angle = 360 / group_size
       init_angle = angle / 2
       distance = EnemyShip.hit_radius * 2.1
@@ -131,6 +137,7 @@ module Phase
 
       objs.each do |obj|
         next if obj.is_a?(Enemy)
+        next if obj.is_a?(Asteroid)
 
         if hit?(obj.hit_circle)
           move(-dx, -dy)
@@ -145,6 +152,18 @@ module Phase
 
     def finish_drop_off
       @enemy_group = nil
+
+      new_target
+    end
+
+    def next_dropoff
+      drop_off_target = drop_off_targets[3 - star_bases.size]
+
+      @target_x = drop_off_target[:x].to_f64
+      @target_y = drop_off_target[:y].to_f64
+    end
+
+    def new_target
       @initial_x = x
 
       # new drop off position

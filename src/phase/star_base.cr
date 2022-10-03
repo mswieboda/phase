@@ -7,7 +7,7 @@ module Phase
     Sprite = "./assets/star_base_small.png"
     SpriteSize = 900
     HitRadius = 450
-    MaxHealth = 3000
+    MaxHealth = 3500
 
     def initialize(x = 0, y = 0)
       super(x, y)

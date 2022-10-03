@@ -15,7 +15,7 @@ module Phase
     Height = 16
     HitRadius = 16
     MaxDistance = 3333
-    Damage = 10
+    Damage = 15
     PlayerLaserColor = SF::Color::Green
     EnemyLaserColor = SF::Color::Red
 
