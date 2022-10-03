@@ -24,7 +24,7 @@ module Phase
       super("beam")
 
       # TODO: start at 0_f64 and grow to MaxDistance quickly using another timer?
-      @distance = MaxDistance * Screen.scaling_factor
+      @distance = MaxDistance.to_f64 #* Screen.scaling_factor
       @duration_timer = Timer.new(Duration)
 
       # sprite
@@ -45,7 +45,7 @@ module Phase
     end
 
     def height
-      SegmentHeight * Screen.scaling_factor
+      SegmentHeight #* Screen.scaling_factor
     end
 
     def update(frame_time, current : Bool, timer_done : Bool, x : Float64, y : Float64, rotation : Float64, shootables : Array(HealthObj))

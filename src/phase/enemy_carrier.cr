@@ -52,7 +52,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius * Screen.scaling_factor
+      HitRadius #* Screen.scaling_factor
     end
 
     def self.max_health

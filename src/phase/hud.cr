@@ -14,19 +14,19 @@ module Phase
     def initialize(ship : Ship)
       @ship = ship
 
-      @text = SF::Text.new("", Font.default, (24 * Screen.scaling_factor).to_i)
+      @text = SF::Text.new("", Font.default, 24) #(24 * Screen.scaling_factor).to_i)
       @text.fill_color = SF::Color::Green
       @text.position = {margin, margin}
 
       y = @text.global_bounds.top + @text.global_bounds.height + margin
 
-      @super_weapon_text = SF::Text.new("", Font.default, (24 * Screen.scaling_factor).to_i)
+      @super_weapon_text = SF::Text.new("", Font.default, 24) #(24 * Screen.scaling_factor).to_i)
       @super_weapon_text.fill_color = TextColor
       @super_weapon_text.position = {margin, y}
     end
 
     def self.margin
-      Margin * Screen.scaling_factor
+      Margin #* Screen.scaling_factor
     end
 
     def margin

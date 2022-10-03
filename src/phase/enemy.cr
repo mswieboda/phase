@@ -51,7 +51,7 @@ module Phase
     end
 
     def self.hit_radius
-      HitRadius * Screen.scaling_factor
+      HitRadius #* Screen.scaling_factor
     end
 
     def update(frame_time, bumpables : Array(HealthObj))

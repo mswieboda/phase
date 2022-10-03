@@ -14,7 +14,7 @@ module Phase
       @sprite = SF::Sprite.new(texture)
       @sprite.position = {x, y}
       @sprite.origin = {SpriteHeight / 2, SpriteHeight / 2}
-      @sprite.scale = {Screen.scaling_factor, Screen.scaling_factor}
+      # @sprite.scale = {Screen.scaling_factor, Screen.scaling_factor}
       @sprite.rotation = rotation
     end
 
