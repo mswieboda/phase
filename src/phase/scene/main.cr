@@ -25,7 +25,7 @@ module Phase::Scene
 
       @view = GSF::View.from_default(window).dup
 
-      # view.zoom(1 / Screen.scaling_factor)
+      view.zoom(Screen.scaling_factor)
 
       @ship = Ship.new(x: 1000, y: 1000)
       @hud = HUD.new(ship)
