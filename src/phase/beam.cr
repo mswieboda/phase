@@ -11,7 +11,7 @@ module Phase
 
     SpriteSegment = "./assets/beam.png"
     SpriteTip = "./assets/beam_tip.png"
-    Damage = 10
+    Damage = 3
     Duration = 1337.milliseconds
     MaxDistance = 3333
     SegmentWidth = 8
