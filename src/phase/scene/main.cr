@@ -42,8 +42,8 @@ module Phase::Scene
         {x: 300, y: 900},
         {x: 1500, y: 1500}
       ].each do |coords|
-        x = coords[:x] #* Screen.scaling_factor
-        y = coords[:y] #* Screen.scaling_factor
+        x = coords[:x] / Screen.scaling_factor
+        y = coords[:y] / Screen.scaling_factor
         enemies << EnemyStatic.new(x: x, y: y)
       end
 
@@ -52,8 +52,8 @@ module Phase::Scene
         {x: 100, y: 300},
         {x: 300, y: 300}
       ].each do |coords|
-        x = coords[:x] #* Screen.scaling_factor
-        y = coords[:y] #* Screen.scaling_factor
+        x = coords[:x] / Screen.scaling_factor
+        y = coords[:y] / Screen.scaling_factor
         enemies << EnemyKamikaze.new(x: x, y: y)
       end
 
@@ -62,8 +62,8 @@ module Phase::Scene
         {x: 333, y: 1669, type: 2},
         {x: 2033, y: 489, type: 3}
       ].each do |meta|
-        x = meta[:x] #* Screen.scaling_factor
-        y = meta[:y] #* Screen.scaling_factor
+        x = meta[:x] / Screen.scaling_factor
+        y = meta[:y] / Screen.scaling_factor
         asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
 
@@ -76,8 +76,8 @@ module Phase::Scene
         {x: 500, y: 100},
         {x: 400, y: 200}
       ].each do |coords|
-        x = coords[:x] #* Screen.scaling_factor
-        y = coords[:y] #* Screen.scaling_factor
+        x = coords[:x] / Screen.scaling_factor
+        y = coords[:y] / Screen.scaling_factor
         enemy_group << EnemyShip.new(x: x, y: y)
       end
 
@@ -87,10 +87,10 @@ module Phase::Scene
       [
         {x: 0, y: 1000, target_x: 900, target_y: 100}
       ].each do |coords|
-        x = coords[:x] #* Screen.scaling_factor
-        y = coords[:y] #* Screen.scaling_factor
-        target_x = coords[:target_x] #* Screen.scaling_factor
-        target_y = coords[:target_y] #* Screen.scaling_factor
+        x = coords[:x] / Screen.scaling_factor
+        y = coords[:y] / Screen.scaling_factor
+        target_x = coords[:target_x] / Screen.scaling_factor
+        target_y = coords[:target_y] / Screen.scaling_factor
         @enemy_carriers << EnemyCarrier.new(x: x, y: y, target_x: target_x, target_y: target_y, star_bases: @star_bases)
       end
 
