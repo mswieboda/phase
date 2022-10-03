@@ -20,6 +20,7 @@ module Phase::Scene
     getter enemy_carriers : Array(EnemyCarrier)
     getter lasers : Array(Laser)
     getter game_over_timer : Timer
+    getter? restart
 
     GameOverWaitDuration = 500.milliseconds
 
@@ -33,6 +34,7 @@ module Phase::Scene
       @ship = Ship.new(x: 1000, y: 1000)
       @hud = HUD.new(ship)
       @game_over_timer = Timer.new(GameOverWaitDuration)
+      @restart = false
 
       @objs = [] of HealthObj
       @star_bases = [] of StarBase
@@ -114,6 +116,10 @@ module Phase::Scene
       if keys.just_pressed?(Keys::Escape)
         @exit = true
         return
+      end
+
+      if keys.just_pressed?(Keys::Enter)
+        @restart = true
       end
 
       if game_over?

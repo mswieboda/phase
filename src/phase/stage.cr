@@ -6,7 +6,7 @@ module Phase
     getter start
     getter main
 
-    def initialize(window : SF::Window)
+    def initialize(window : SF::RenderWindow)
       super(window)
 
       @start = Scene::Start.new
@@ -21,10 +21,20 @@ module Phase
         if scene.exit?
           @exit = true
         elsif start_scene = start.start_scene
-          switch(main) if start_scene == :main
+          start(:main) if start_scene == :main
+        elsif start.continue?
+          switch(main)
         end
       when :main
         switch(start) if scene.exit?
+        start(:main) if main.restart?
+      end
+    end
+
+    def start(scene_name : Symbol)
+      if scene_name == :main
+        @main = Scene::Main.new(window)
+        switch(@main)
       end
     end
   end
