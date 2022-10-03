@@ -4,7 +4,7 @@ module Phase
   class Game < GSF::Game
     getter manager
 
-    DebugVideoModes = true
+    DebugVideoModes = false
 
     def initialize
       mode = SF::VideoMode.desktop_mode

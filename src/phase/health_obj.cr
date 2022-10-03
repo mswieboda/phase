@@ -13,7 +13,7 @@ module Phase
     HitRadius = 64
     MaxHealth = 100
     CollisionDamage = 15
-    DebugHitBox = true
+    DebugHitBox = false
     HitColor = SF::Color::Red
     UnhitColor = SF::Color::White
     HitSound = SF::SoundBuffer.from_file("./assets/hit.wav")
