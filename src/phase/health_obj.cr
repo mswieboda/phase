@@ -12,7 +12,7 @@ module Phase
 
     HitRadius = 64
     MaxHealth = 100
-    CollisionDamage = 15
+    CollisionDamage = 5
     DebugHitBox = false
     HitColor = SF::Color::Red
     UnhitColor = SF::Color::White
@@ -65,7 +65,7 @@ module Phase
       hit? ? HitColor : unhit_color
     end
 
-    def update(frame_time, bumpables : Array(HealthObj))
+    def update(frame_time, objs : Array(HealthObj))
       reset_hit_bumped
     end
 
@@ -96,21 +96,21 @@ module Phase
       false
     end
 
-    def bump(dx, dy, bumped_by, bumpables)
+    def bump(dx, dy, bumped_by, objs)
       return if bumped?
 
       @bumped = true
 
       move(dx, dy)
 
-      bumpables.each do |bumpable|
-        next if bumpable == self
-        next if bumpable == bumped_by
-        next if bumpable.is_a?(EnemyCarrier)
+      objs.each do |obj|
+        next if obj == self
+        next if obj == bumped_by
+        next if obj.is_a?(EnemyCarrier)
 
-        if hit?(bumpable.hit_circle)
+        if hit?(obj.hit_circle)
           move(-dx, -dy)
-          bumpable.bump(dx, dy, self, bumpables)
+          obj.bump(dx, dy, self, objs)
         end
       end
     end
@@ -124,6 +124,7 @@ module Phase
     end
 
     def hit(damage : Int32)
+      hit_sound.pitch = rand(0.5) + 0.75
       hit_sound.play
 
       @hit = true

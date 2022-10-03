@@ -38,7 +38,6 @@ module Phase
     FireDuration = 150.milliseconds
     SuperWeaponDuration = 10.seconds
     BumpBackFactor = 3
-    LaserColor = SF::Color::Green
     FireSound = SF::SoundBuffer.from_file("./assets/pew.wav")
 
     def initialize(x = 0, y = 0)
@@ -101,7 +100,7 @@ module Phase
 
       @fire_timer = Timer.new(FireDuration)
       @fire_sound = SF::Sound.new(FireSound)
-      @fire_sound.volume = 33
+      @fire_sound.volume = 100
       @lasers = [] of Laser
       @cannon = Cannon.new(x, y)
     end
@@ -118,8 +117,8 @@ module Phase
       HitRadius
     end
 
-    def update(frame_time, keys : Keys, mouse : Mouse, shootables : Array(HealthObj), bumpables : Array(HealthObj))
-      super(frame_time, bumpables)
+    def update(frame_time, keys : Keys, mouse : Mouse, objs : Array(HealthObj))
+      super(frame_time, objs)
 
       animations.update(frame_time)
 
@@ -129,12 +128,17 @@ module Phase
 
       mouse_rotation = mouse.to_rotation(Screen.width / 2, Screen.height / 2)
 
-      update_movement(frame_time, keys, bumpables)
-      update_cannon(frame_time, mouse, mouse_rotation, shootables)
-      update_super_weapon(frame_time, keys, mouse, mouse_rotation, shootables)
+      update_movement(frame_time, keys, objs)
+
+      shootable_objs = objs.select do |obj|
+        !obj.is_a?(Ship) && !obj.is_a?(StarBase)
+      end
+
+      update_cannon(frame_time, mouse, mouse_rotation, shootable_objs)
+      update_super_weapon(frame_time, keys, mouse, mouse_rotation, shootable_objs)
     end
 
-    def update_movement(frame_time, keys : Keys, bumpables : Array(HealthObj))
+    def update_movement(frame_time, keys : Keys, objs : Array(HealthObj))
       dx = 0_f64
       dy = 0_f64
       speed = Speed * frame_time
@@ -156,14 +160,14 @@ module Phase
       if dx != 0 || dy != 0
         move_thrust(dx, dy)
 
-        bumpables.each do |bumpable|
-          next if bumpable == self
+        objs.each do |obj|
+          next if obj == self
 
-          if hit?(bumpable.hit_circle)
-            hit(bumpable.collision_damage)
+          if hit?(obj.hit_circle)
+            hit(obj.collision_damage)
 
-            bx = x - bumpable.x
-            by = y - bumpable.y
+            bx = x - obj.x
+            by = y - obj.y
             bx = bx.zero? ? 0 : bx / bx.abs
             by = by.zero? ? 0 : by / by.abs
             bx = (bx * BumpBackFactor).to_f64
@@ -171,8 +175,8 @@ module Phase
 
             move(-dx + bx, -dy + by)
 
-            unless bumpable.static?
-              bumpable.bump(dx * BumpBackFactor, dy * BumpBackFactor, self, bumpables)
+            unless obj.static?
+              obj.bump(dx * BumpBackFactor, dy * BumpBackFactor, self, objs)
             end
           end
         end
@@ -270,8 +274,9 @@ module Phase
     end
 
     def fire(mouse_rotation : Float64)
+      fire_sound.pitch = rand(0.10) + 0.95
       fire_sound.play
-      @lasers << Laser.new(x, y, mouse_rotation, LaserColor)
+      @lasers << Laser.new(x, y, mouse_rotation)
     end
 
     def play_thruster(dir : Symbol)

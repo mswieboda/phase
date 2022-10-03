@@ -3,54 +3,91 @@ require "./star_base"
 
 module Phase
   class EnemyShip < Enemy
-    # getter star_base_target : StarBase
+    getter fire_timer : Timer
+    getter fire_sound
+    getter laser : Laser?
 
     Sheet = "./assets/enemy.png"
-    # TargetDistanceThreshold = 500
-    # TargetMoveSpeed = 333
-    # RotationSpeed = 100
+    ShootDistance = 1280
+    LaserHeight = 16
+    DebugShootBox = false
+    FireDuration = 500.milliseconds
+    FireSound = SF::SoundBuffer.from_file("./assets/pew.wav")
 
-    # def initialize(x, y, star_base : StarBase)
-    #   super(x, y)
+    def initialize(x = 0, y = 0)
+      super(x, y)
 
-    #   @star_base_target = star_base
-    # end
+      @fire_timer = Timer.new(FireDuration)
+      @fire_sound = SF::Sound.new(FireSound)
+      @fire_sound.volume = 100
+      @laser = nil
+    end
 
     def self.sheet
       Sheet
     end
 
-    # def update(frame_time, star_bases : Array(StarBase))
-    #   super(frame_time)
+    def shoot_box
+      Box.new(x, y, ShootDistance, LaserHeight, rotation, x, y + LaserHeight / 2)
+    end
 
-    #   target_next_star_base(star_bases)
+    def update(frame_time, objs : Array(HealthObj))
+      super
 
-    #   update_movement(frame_time)
-    # end
+      @laser = nil
 
-    # def target_next_star_base(star_bases : Array(StarBase))
-    #   if star_base_target.remove?
-    #     star_base_target = star_bases.first
-    #   end
-    # end
+      shoot_check(objs)
+    end
 
-    # def update_movement(frame_time)
-    #   rotate_to_target(frame_time)
-    #   move_to_target(frame_time)
-    # end
+    def draw(window : SF::RenderWindow)
+      super
 
-    # def rotate_to_target(frame_time)
-    #   target_rotation = rotation_to(star_base_target)
+      draw_shoot_box(window)
+    end
 
-    #   rotate_towards(target_rotation, RotationSpeed * frame_time) unless facing?(target_rotation)
-    # end
+    def draw_shoot_box(window : SF::RenderWindow)
+      return unless DebugShootBox
 
-    # def move_to_target(frame_time)
-    #   target_distance = distance(star_base_target)
+      sb = shoot_box
+      rect = SF::RectangleShape.new({sb.width, sb.height})
+      rect.fill_color = SF.color(0, 0, 0, 0)
+      rect.outline_thickness = 2
+      rect.outline_color = SF.color(255, 0, 255)
+      rect.origin = {0, LaserHeight / 2}
+      rect.position = {sb.x, sb.y}
+      rect.rotation = sb.rotation
 
-    #   unless target_distance.abs < TargetDistanceThreshold
-    #     move_forward(TargetMoveSpeed * frame_time)
-    #   end
-    # end
+      window.draw(rect)
+    end
+
+    def shoot_check(objs)
+      objs.each do |obj|
+        next if obj.is_a?(Enemy)
+        next unless obj.hit_circle.intersects?(shoot_box)
+
+        if fire_timer.started?
+          if fire_timer.done?
+            fire
+
+            fire_timer.restart
+          end
+        else
+          fire_timer.start
+
+          fire
+        end
+
+        return
+      end
+
+      fire_timer.stop
+    end
+
+    def fire
+      fire_sound.pitch = rand(0.5) + 0.75
+      fire_sound.play
+
+      @laser = Laser.new(x, y, rotation, from_enemy: true)
+    end
   end
 end

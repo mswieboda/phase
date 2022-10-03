@@ -10,7 +10,7 @@ module Phase
     RotationSpeed = 100
     FacingRotationThreshold = 0.1_f32
     TargetDistanceThreshold = 500
-    TargetMoveSpeed = 333
+    TargetMoveSpeed = 300
 
     def initialize(star_bases, enemies = [] of EnemyShip)
       @rotation = 0
@@ -46,13 +46,13 @@ module Phase
       mid_y
     end
 
-    def update(frame_time, bumpables : Array(HealthObj))
-      update_movement(frame_time, bumpables)
+    def update(frame_time, objs : Array(HealthObj))
+      update_movement(frame_time, objs)
     end
 
-    def update_movement(frame_time, bumpables : Array(HealthObj))
+    def update_movement(frame_time, objs : Array(HealthObj))
       rotate_to_target(frame_time)
-      move_to_target(frame_time, bumpables)
+      move_to_target(frame_time, objs)
     end
 
     def rotate_to_target(frame_time)
@@ -65,16 +65,16 @@ module Phase
       (Calc.shortest_delta(target_rotation, rotation)).abs < FacingRotationThreshold
     end
 
-    def move_to_target(frame_time, bumpables : Array(HealthObj))
+    def move_to_target(frame_time, objs : Array(HealthObj))
       target_distance = distance(star_base_target)
 
       unless target_distance.abs < TargetDistanceThreshold
-        move_forward(TargetMoveSpeed * frame_time, bumpables)
+        move_forward(TargetMoveSpeed * frame_time, objs)
       end
     end
 
-    def move_forward(speed, bumpables : Array(HealthObj))
-      enemies.each(&.move_forward(speed, bumpables))
+    def move_forward(speed, objs : Array(HealthObj))
+      enemies.each(&.move_forward(speed, objs))
     end
 
     def rotate(amount)

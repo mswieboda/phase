@@ -14,11 +14,11 @@ module Phase::Scene
     getter view : GSF::View
     getter hud
     getter ship
-    getter shootables : Array(HealthObj)
-    getter bumpables : Array(HealthObj)
+    getter objs : Array(HealthObj)
     getter star_bases : Array(StarBase)
     getter enemy_groups : Array(EnemyGroup)
     getter enemy_carriers : Array(EnemyCarrier)
+    getter lasers : Array(Laser)
 
     def initialize(window)
       super(:main)
@@ -29,11 +29,11 @@ module Phase::Scene
 
       @ship = Ship.new(x: 1000, y: 1000)
       @hud = HUD.new(ship)
-      @shootables = [] of HealthObj
-      @bumpables = [] of HealthObj
+      @objs = [] of HealthObj
       @star_bases = [] of StarBase
       @enemy_carriers = [] of EnemyCarrier
       @enemy_groups = [] of EnemyGroup
+      @lasers = [] of Laser
 
       enemies = [] of Enemy
       asteroids = [] of Asteroid
@@ -69,7 +69,7 @@ module Phase::Scene
         asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
 
-      @star_bases << StarBase.new(x: 1999, y: 1999)
+      @star_bases << StarBase.new(x: 3999, y: 3999)
 
       # enemy ships
       enemy_group = [] of EnemyShip
@@ -96,14 +96,8 @@ module Phase::Scene
         @enemy_carriers << EnemyCarrier.new(x: x, y: y, target_x: target_x, target_y: target_y, star_bases: @star_bases)
       end
 
-      @shootables
-        .concat(enemies)
-        .concat(enemy_carriers)
-        .concat(enemy_groups.flat_map(&.enemies))
-        .concat(asteroids)
-
-      @bumpables
-        .concat([ship])
+      @objs << ship
+      @objs
         .concat(enemies)
         .concat(enemy_carriers)
         .concat(enemy_groups.flat_map(&.enemies))
@@ -117,10 +111,12 @@ module Phase::Scene
         return
       end
 
-      update_bumpables(frame_time)
+      ship.update(frame_time, keys, mouse, objs)
+      update_objs(frame_time)
+      add_lasers
+      update_lasers(frame_time)
       update_enemy_carriers
-      enemy_groups.each(&.update(frame_time, bumpables))
-      ship.update(frame_time, keys, mouse, shootables, bumpables)
+      enemy_groups.each(&.update(frame_time, objs))
 
       view.center(ship.x, ship.y)
       hud.update(frame_time)
@@ -130,9 +126,8 @@ module Phase::Scene
       # map view
       view.set_current
 
-      bumpables.each(&.draw(window))
-      # enemy_groups.flat_map(&.enemies).each(&.draw(window))
-      ship.draw(window)
+      objs.each(&.draw(window))
+      lasers.each(&.draw(window))
 
       # default view
       view.set_default_current
@@ -140,20 +135,28 @@ module Phase::Scene
       hud.draw(window)
     end
 
-    def update_bumpables(frame_time)
-      bumpables.each(&.update(frame_time, bumpables))
+    def update_objs(frame_time)
+      objs.each(&.update(frame_time, objs))
 
-      bumpables.select(&.remove?).each do |bumpable|
-        shootables.delete(bumpable)
-        bumpables.delete(bumpable)
+      objs.select(&.remove?).each do |obj|
+        objs.delete(obj)
 
-        enemy_groups.each do |enemy_group|
-          enemy_group.enemies.delete(bumpable)
+        if obj.is_a?(EnemyShip)
+          enemy_groups.each do |enemy_group|
+            enemy_group.enemies.delete(obj)
 
-          if enemy_group.enemies.empty?
-            enemy_groups.delete(enemy_group)
+            if enemy_group.enemies.empty?
+              enemy_groups.delete(enemy_group)
+            end
           end
         end
+      end
+    end
+
+    def update_lasers(frame_time)
+      lasers.each(&.update(frame_time, objs))
+      lasers.select(&.remove?).each do |laser|
+        lasers.delete(laser)
       end
     end
 
@@ -162,10 +165,17 @@ module Phase::Scene
         if enemy_group = enemy_carrier.enemy_group
           @enemy_groups << enemy_group
 
-          @shootables.concat(enemy_group.enemies)
-          @bumpables.concat(enemy_group.enemies)
+          @objs.concat(enemy_group.enemies)
 
           enemy_carrier.finish_drop_off
+        end
+      end
+    end
+
+    def add_lasers
+      @enemy_groups.flat_map(&.enemies).each do |enemy_ship|
+        if laser = enemy_ship.laser
+          @lasers << laser
         end
       end
     end

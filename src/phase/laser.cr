@@ -7,17 +7,19 @@ module Phase
     getter rotation : Float64
     getter animations
     getter? remove
+    getter? from_enemy
 
-    Speed = 1989
+    Speed = 1337
     Sheet = "./assets/laser.png"
     Width = 48
     Height = 16
     HitRadius = 16
     MaxDistance = 3333
-    Damage = 20
-    LaserColor = SF::Color::White
+    Damage = 10
+    PlayerLaserColor = SF::Color::Green
+    EnemyLaserColor = SF::Color::Red
 
-    def initialize(x = 0_f32, y = 0_f32, rotation = 0, color = LaserColor)
+    def initialize(x = 0_f32, y = 0_f32, rotation = 0, from_enemy = false)
       @x = x
       @y = y
       @init_x = x
@@ -27,10 +29,11 @@ module Phase
       # animations
       fps = 60
       idle = GSF::Animation.new((fps / 3).to_i, loops: false)
-      idle.add(Sheet, 0, 0, Width, Height, rotation: rotation, color: color)
+      idle.add(Sheet, 0, 0, Width, Height, rotation: rotation, color: from_enemy ? EnemyLaserColor : PlayerLaserColor)
 
       @animations = GSF::Animations.new(:idle, idle)
       @remove = false
+      @from_enemy = from_enemy
     end
 
     def self.hit_radius
@@ -85,6 +88,13 @@ module Phase
 
     def check_shootables(shootables : Array(HealthObj))
       shootables.each do |shootable|
+        if from_enemy?
+          next if shootable.is_a?(Enemy)
+        else
+          next if shootable.is_a?(Ship)
+          next if shootable.is_a?(StarBase)
+        end
+
         if hit?(shootable.hit_circle)
           shootable.hit(Damage)
 

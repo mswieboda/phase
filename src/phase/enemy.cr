@@ -55,7 +55,7 @@ module Phase
       HitRadius
     end
 
-    def update(frame_time, bumpables : Array(HealthObj))
+    def update(frame_time, objs : Array(HealthObj))
       super
 
       animations.update(frame_time)
@@ -70,17 +70,17 @@ module Phase
       (Calc.shortest_delta(target_rotation, rotation)).abs < FacingRotationThreshold
     end
 
-    def move_forward(speed, bumpables : Array(HealthObj))
+    def move_forward(speed, objs : Array(HealthObj))
       theta = rotation * Math::PI / 180
       dx = speed * Math.cos(theta)
       dy = speed * Math.sin(theta)
 
       move(dx, dy)
 
-      bumpables.each do |bumpable|
-        if !bumpable.is_a?(EnemyCarrier) && hit?(bumpable.hit_circle)
-          bx = x - bumpable.x
-          by = y - bumpable.y
+      objs.each do |obj|
+        if !obj.is_a?(EnemyCarrier) && hit?(obj.hit_circle)
+          bx = x - obj.x
+          by = y - obj.y
           bx = bx.zero? ? 0 : bx / bx.abs
           by = by.zero? ? 0 : by / by.abs
           bx = (bx * BumpBackFactor).to_f64
@@ -88,8 +88,8 @@ module Phase
 
           move(bx, by)
 
-          unless bumpable.static?
-            bumpable.bump(bx, by, self, bumpables)
+          unless obj.static?
+            obj.bump(bx, by, self, objs)
           end
         end
       end

@@ -39,7 +39,7 @@ module Phase
       true
     end
 
-    def bump(dx, dy, bumped_by, bumpables)
+    def bump(dx, dy, bumped_by, objs)
       bumped_by.move(-dx, -dy)
     end
   end

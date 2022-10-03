@@ -59,8 +59,8 @@ module Phase
       MaxHealth
     end
 
-    def update(frame_time, bumpables : Array(HealthObj))
-      super(frame_time, bumpables)
+    def update(frame_time, objs : Array(HealthObj))
+      super(frame_time, objs)
 
       distance = distance(target_x, target_y).abs
 
@@ -68,7 +68,7 @@ module Phase
         rotation_speed = distance < FastRotateDistanceThreshold ? CloseRotationSpeed : RotationSpeed
 
         rotate_to_target(rotation_speed * frame_time)
-        move_forward(MoveSpeed * frame_time, bumpables)
+        move_forward(MoveSpeed * frame_time, objs)
       elsif !facing?(drop_off_target_rotation)
         rotate_towards(drop_off_target_rotation, RotationSpeed * frame_time)
       else
@@ -117,24 +117,24 @@ module Phase
       @enemy_group = EnemyGroup.new(star_bases: star_bases, enemies: enemies)
     end
 
-    def move_forward(speed, bumpables : Array(HealthObj))
+    def move_forward(speed, objs : Array(HealthObj))
       theta = rotation * Math::PI / 180
       dx = speed * Math.cos(theta)
       dy = speed * Math.sin(theta)
 
       move(dx, dy)
 
-      bumpables.each do |bumpable|
-        next if bumpable.is_a?(Enemy)
+      objs.each do |obj|
+        next if obj.is_a?(Enemy)
 
-        if hit?(bumpable.hit_circle)
+        if hit?(obj.hit_circle)
           move(-dx, -dy)
-          bumpable.bump(dx, dy, self, bumpables)
+          obj.bump(dx, dy, self, objs)
         end
       end
     end
 
-    def bump(dx, dy, bumped_by, bumpables)
+    def bump(dx, dy, bumped_by, objs)
       bumped_by.move(-dx, -dy) unless bumped_by.is_a?(Enemy)
     end
 
