@@ -20,6 +20,7 @@ module Phase
       super(title: "phase", mode: mode, style: style) #, default_height: 2100)
 
       window.framerate_limit = 69
+      window.default_view.zoom(Screen.scaling_factor)
 
       if DebugVideoModes
         puts ">>> SF::VideoMode.fullscreen_modes:"
