@@ -69,7 +69,7 @@ module Phase::Scene
         asteroids << Asteroid.new(x: x, y: y, sprite_type: meta[:type])
       end
 
-      @star_bases << StarBase.new(x: 3999, y: 3999)
+      @star_bases << StarBase.new(x: 1999, y: 1999)
 
       # enemy ships
       enemy_group = [] of EnemyShip
@@ -111,6 +111,11 @@ module Phase::Scene
         return
       end
 
+      if game_over?
+        hud.update(frame_time, game_over?, game_over_message)
+        return
+      end
+
       ship.update(frame_time, keys, mouse, objs)
       update_objs(frame_time)
       add_lasers
@@ -119,7 +124,7 @@ module Phase::Scene
       enemy_groups.each(&.update(frame_time, objs))
 
       view.center(ship.x, ship.y)
-      hud.update(frame_time)
+      hud.update(frame_time, false, nil)
     end
 
     def draw(window)
@@ -150,6 +155,10 @@ module Phase::Scene
             end
           end
         end
+
+        if obj.is_a?(StarBase)
+          star_bases.delete(obj)
+        end
       end
     end
 
@@ -177,6 +186,20 @@ module Phase::Scene
         if laser = enemy_ship.laser
           @lasers << laser
         end
+      end
+    end
+
+    def game_over?
+      star_bases.empty? || ship.remove?
+    end
+
+    def game_over_message
+      if ship.remove?
+        "you were destroyed"
+      elsif star_bases.empty?
+        "star bases were destroyed"
+      else
+        nil
       end
     end
   end

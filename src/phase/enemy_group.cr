@@ -19,6 +19,8 @@ module Phase
     end
 
     def star_base_target
+      return nil unless star_bases.any?
+
       star_bases.first
     end
 
@@ -56,9 +58,11 @@ module Phase
     end
 
     def rotate_to_target(frame_time)
-      target_rotation = rotation_to(star_base_target)
+      if target = star_base_target
+        target_rotation = rotation_to(target)
 
-      rotate_towards(target_rotation, RotationSpeed * frame_time) unless facing?(target_rotation)
+        rotate_towards(target_rotation, RotationSpeed * frame_time) unless facing?(target_rotation)
+      end
     end
 
     def facing?(target_rotation)
@@ -66,10 +70,12 @@ module Phase
     end
 
     def move_to_target(frame_time, objs : Array(HealthObj))
-      target_distance = distance(star_base_target)
+      if target = star_base_target
+        target_distance = distance(target)
 
-      unless target_distance.abs < TargetDistanceThreshold
-        move_forward(TargetMoveSpeed * frame_time, objs)
+        unless target_distance.abs < TargetDistanceThreshold
+          move_forward(TargetMoveSpeed * frame_time, objs)
+        end
       end
     end
 
