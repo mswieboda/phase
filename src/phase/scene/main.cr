@@ -21,6 +21,7 @@ module Phase::Scene
     getter lasers : Array(Laser)
     getter game_over_timer : Timer
     getter? restart
+    getter score : Int32
 
     GameOverWaitDuration = 500.milliseconds
 
@@ -35,6 +36,7 @@ module Phase::Scene
       @hud = HUD.new(ship)
       @game_over_timer = Timer.new(GameOverWaitDuration)
       @restart = false
+      @score = 0
 
       @objs = [] of HealthObj
       @star_bases = [] of StarBase
@@ -124,7 +126,8 @@ module Phase::Scene
 
       if game_over?
         if game_over_timer.done?
-          hud.update(frame_time, game_over?, game_over_message)
+          ship.super_weapon_timer.pause
+          hud.update(frame_time, score, game_over?, game_over_message)
           return
         else
           game_over_timer.start unless game_over_timer.started?
@@ -139,7 +142,7 @@ module Phase::Scene
       enemy_groups.each(&.update(frame_time, objs))
 
       view.center(ship.x, ship.y)
-      hud.update(frame_time, false, nil)
+      hud.update(frame_time, score, false, nil)
     end
 
     def draw(window)
@@ -164,6 +167,12 @@ module Phase::Scene
 
       objs.select(&.remove?).each do |obj|
         objs.delete(obj)
+
+        if obj.is_a?(Enemy)
+          enemy = obj.as(Enemy)
+
+          @score += obj.score_value
+        end
 
         if obj.is_a?(EnemyShip)
           enemy_groups.each do |enemy_group|

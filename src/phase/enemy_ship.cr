@@ -13,6 +13,7 @@ module Phase
     DebugShootBox = false
     FireDuration = 500.milliseconds
     FireSound = SF::SoundBuffer.from_file("./assets/pew.wav")
+    ScoreValue = 3
 
     def initialize(x = 0, y = 0)
       super(x, y)
@@ -25,6 +26,10 @@ module Phase
 
     def self.sheet
       Sheet
+    end
+
+    def self.score_value
+      ScoreValue
     end
 
     def shoot_box

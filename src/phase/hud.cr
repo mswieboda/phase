@@ -4,14 +4,15 @@ module Phase
   class HUD
     getter ship : Ship
     getter text
-    getter super_weapon_text
+    getter super_percent_text : String
+    getter score_text : String
     getter? game_over
     getter game_over_message : String?
 
     Margin = 10
 
-    TextColor = SF::Color::White
-    TextSelectedColor = SF::Color::Green
+    TextColor = SF::Color::Green
+    TextSelectedColor = SF::Color::White
 
     def initialize(ship : Ship)
       @ship = ship
@@ -20,12 +21,8 @@ module Phase
       @text.fill_color = SF::Color::Green
       @text.position = {margin, margin}
 
-      y = @text.global_bounds.top + @text.global_bounds.height + margin
-
-      @super_weapon_text = SF::Text.new("", Font.default, (24 * Screen.scaling_factor).to_i)
-      @super_weapon_text.fill_color = TextColor
-      @super_weapon_text.position = {margin, y}
-
+      @super_percent_text = "super: 0%"
+      @score_text = "score: 0"
       @game_over = false
       @game_over_message = nil
     end
@@ -38,39 +35,63 @@ module Phase
       self.class.margin
     end
 
-    def update(frame_time, game_over, game_over_message)
+    def update(frame_time, score, game_over, game_over_message)
       @game_over = game_over
       @game_over_message = game_over_message
 
+      @score_text = "score: #{score}"
+
       percent = (ship.super_weapon_timer.percent * 100).to_i
-      @text.string = "super weapon: #{percent}%"
+      @super_percent_text = "super: #{percent}%"
     end
 
     def draw(window : SF::RenderWindow)
-      window.draw(text)
+      @text.position = {margin, margin}
+
+      draw_score(window)
+      draw_super_percent(window)
       draw_super_weapons(window)
 
       draw_game_over(window) if game_over?
     end
 
+    def draw_score(window)
+      y = text.global_bounds.top + text.global_bounds.height
+
+      text.string = score_text
+      text.position = {margin, y}
+
+      window.draw(text)
+    end
+
+    def draw_super_percent(window)
+      y = text.global_bounds.top + text.global_bounds.height + margin
+
+      text.string = super_percent_text
+      text.position = {margin, y}
+
+      window.draw(text)
+    end
+
     def draw_super_weapons(window)
-      y = @text.global_bounds.top + @text.global_bounds.height + margin
+      y = text.global_bounds.top + text.global_bounds.height + margin
 
       ship.super_weapons.each_with_index do |weapon, index|
-        super_weapon_text.string = weapon.name
-        y += super_weapon_text.global_bounds.height + margin
-        super_weapon_text.position = {margin, y}
+        text.string = weapon.name
+        y += text.global_bounds.height + margin
+        text.position = {margin, y}
         selected = ship.super_weapon.name == weapon.name
-        super_weapon_text.fill_color = selected ? TextSelectedColor : TextColor
+        text.fill_color = selected ? TextSelectedColor : TextColor
 
-        window.draw(super_weapon_text)
+        window.draw(text)
       end
     end
 
     def draw_game_over(window)
       x = Screen.width / 2
-      y = Screen.height / 3
+      y = Screen.height / 4
 
+      # header
       header = SF::Text.new("Game Over", Font.default, (60 * Screen.scaling_factor).to_i)
       header.fill_color = SF::Color::Green
 
@@ -86,10 +107,28 @@ module Phase
       window.draw(rect)
       window.draw(header)
 
-      y += header.global_bounds.height + margin * 4
+      y += header.global_bounds.height + margin * 5
 
+      # score
+      score = SF::Text.new(score_text, Font.default, (36 * Screen.scaling_factor).to_i)
+      score.fill_color = SF::Color::Green
+
+      dx = x - score.global_bounds.width / 2
+
+      score.position = {dx, y}
+
+      rect = SF::RectangleShape.new({score.global_bounds.width + margin * 2, score.global_bounds.height + margin * 2})
+      rect.fill_color = SF::Color::Black
+      rect.position = {dx - margin, y - margin}
+
+      window.draw(rect)
+      window.draw(score)
+
+      y += score.global_bounds.height + margin * 7
+
+      # game over message
       if message_text = game_over_message
-        message = SF::Text.new(message_text, Font.default, (36 * Screen.scaling_factor).to_i)
+        message = SF::Text.new(message_text, Font.default, (26 * Screen.scaling_factor).to_i)
         message.fill_color = SF::Color::Green
 
         dx = x - message.global_bounds.width / 2
@@ -103,10 +142,11 @@ module Phase
         window.draw(rect)
         window.draw(message)
 
-        y += message.global_bounds.height + margin * 2
+        y += message.global_bounds.height + margin * 3
       end
 
-      action = SF::Text.new("press enter to restart", Font.default, (36 * Screen.scaling_factor).to_i)
+      # action
+      action = SF::Text.new("press enter to restart", Font.default, (32 * Screen.scaling_factor).to_i)
       action.fill_color = SF::Color::Green
 
       dx = x - action.global_bounds.width / 2

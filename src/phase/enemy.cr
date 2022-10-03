@@ -11,6 +11,7 @@ module Phase
     FacingRotationThreshold = 0.1_f32
     RotationSpeed = 100
     BumpBackFactor = 3
+    ScoreValue = 1
 
     def initialize(x = 0, y = 0, rotation = 0)
       super(x, y)
@@ -53,6 +54,14 @@ module Phase
 
     def self.hit_radius
       HitRadius
+    end
+
+    def self.score_value
+      ScoreValue
+    end
+
+    def score_value
+      self.class.score_value
     end
 
     def update(frame_time, objs : Array(HealthObj))
