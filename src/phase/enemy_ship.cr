@@ -20,7 +20,6 @@ module Phase
 
       @fire_timer = Timer.new(FireDuration)
       @fire_sound = SF::Sound.new(FireSound)
-      @fire_sound.volume = 100
       @laser = nil
     end
 

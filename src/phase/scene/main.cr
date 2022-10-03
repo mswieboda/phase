@@ -8,6 +8,7 @@ require "../enemy_carrier"
 require "../enemy_group"
 require "../asteroid"
 require "../star_base"
+require "../blockade_ship"
 
 module Phase::Scene
   class Main < GSF::Scene
@@ -18,6 +19,7 @@ module Phase::Scene
     getter star_bases : Array(StarBase)
     getter enemy_groups : Array(EnemyGroup)
     getter enemy_carriers : Array(EnemyCarrier)
+    getter blockade_ships : Array(BlockadeShip)
     getter lasers : Array(Laser)
     getter game_over_timer : Timer
     getter? restart
@@ -43,10 +45,10 @@ module Phase::Scene
       @star_bases = [] of StarBase
       @enemy_carriers = [] of EnemyCarrier
       @enemy_groups = [] of EnemyGroup
+      @blockade_ships = [] of BlockadeShip
       @lasers = [] of Laser
 
-      enemies = [] of Enemy
-      asteroids = [] of Asteroid
+      @objs << ship
 
       # asteroids
       [
@@ -145,7 +147,14 @@ module Phase::Scene
         {x: 460, y: 6360},
         {x: 1020, y: 6240}
       ].each do |coords|
-        asteroids << Asteroid.new(x: coords[:x], y: coords[:y], sprite_type: rand(3) + 1)
+        @objs << Asteroid.new(x: coords[:x], y: coords[:y], sprite_type: rand(3) + 1)
+      end
+
+      # blockade ships
+      10.times do |n|
+        x = 10000
+        y = 300 + 760 * n
+        @blockade_ships << BlockadeShip.new(x: x, y: y)
       end
 
       [
@@ -165,13 +174,7 @@ module Phase::Scene
       y = @drop_off_targets[0][:y]
       @enemy_carriers << EnemyCarrier.new(x: x, y: y, star_bases: @star_bases, drop_off_targets: @drop_off_targets)
 
-      @objs << ship
-      @objs
-        .concat(enemies)
-        .concat(enemy_carriers)
-        .concat(enemy_groups.flat_map(&.enemies))
-        .concat(asteroids)
-        .concat(star_bases)
+      @objs.concat(enemy_carriers).concat(star_bases).concat(blockade_ships)
     end
 
     def update(frame_time, keys : Keys, mouse : Mouse, joysticks : Joysticks)
@@ -273,6 +276,10 @@ module Phase::Scene
             end
           end
         end
+
+        if obj.is_a?(BlockadeShip)
+          blockade_ships.delete(obj)
+        end
       end
     end
 
@@ -304,6 +311,12 @@ module Phase::Scene
 
       if laser = ship.laser
         @lasers << laser
+      end
+
+      blockade_ships.each do |blockade_ship|
+        if laser = blockade_ship.laser
+          @lasers << laser
+        end
       end
     end
 
