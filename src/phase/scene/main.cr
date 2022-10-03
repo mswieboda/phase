@@ -19,6 +19,9 @@ module Phase::Scene
     getter enemy_groups : Array(EnemyGroup)
     getter enemy_carriers : Array(EnemyCarrier)
     getter lasers : Array(Laser)
+    getter game_over_timer : Timer
+
+    GameOverWaitDuration = 500.milliseconds
 
     def initialize(window)
       super(:main)
@@ -29,6 +32,8 @@ module Phase::Scene
 
       @ship = Ship.new(x: 1000, y: 1000)
       @hud = HUD.new(ship)
+      @game_over_timer = Timer.new(GameOverWaitDuration)
+
       @objs = [] of HealthObj
       @star_bases = [] of StarBase
       @enemy_carriers = [] of EnemyCarrier
@@ -112,8 +117,12 @@ module Phase::Scene
       end
 
       if game_over?
-        hud.update(frame_time, game_over?, game_over_message)
-        return
+        if game_over_timer.done?
+          hud.update(frame_time, game_over?, game_over_message)
+          return
+        else
+          game_over_timer.start unless game_over_timer.started?
+        end
       end
 
       ship.update(frame_time, keys, mouse, objs)
