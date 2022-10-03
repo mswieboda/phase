@@ -101,6 +101,7 @@ module Phase::Scene
         .concat(asteroids)
 
       @bumpables
+        .concat([ship])
         .concat(enemies)
         .concat(enemy_carriers)
         .concat(enemy_groups.flat_map(&.enemies))

@@ -157,6 +157,8 @@ module Phase
         move_thrust(dx, dy)
 
         bumpables.each do |bumpable|
+          next if bumpable == self
+
           if hit?(bumpable.hit_circle)
             hit(bumpable.collision_damage)
             move(-dx * BumpBackFactor, -dy * BumpBackFactor)

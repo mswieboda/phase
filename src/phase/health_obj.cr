@@ -8,6 +8,7 @@ module Phase
     getter? remove
     getter? hit
     getter hit_sound
+    getter? bumped
 
     Sprite = "./assets/star_base_small.png"
     Size = 900
@@ -25,6 +26,7 @@ module Phase
       @health = max_health
       @remove = false
       @hit = false
+      @bumped = false
       @hit_sound = SF::Sound.new(HitSound)
       @hit_sound.volume = 33
     end
@@ -66,7 +68,7 @@ module Phase
     end
 
     def update(frame_time, bumpables : Array(HealthObj))
-      reset_hit
+      reset_hit_bumped
     end
 
     def draw(window : SF::RenderWindow)
@@ -93,6 +95,10 @@ module Phase
     end
 
     def bump(dx, dy, bumped_by, bumpables)
+      return if bumped?
+
+      @bumped = true
+
       move(dx, dy)
 
       bumpables.each do |bumpable|
@@ -127,8 +133,9 @@ module Phase
       end
     end
 
-    def reset_hit
+    def reset_hit_bumped
       @hit = false
+      @bumped = false
     end
 
     def rotation_to(other_x, other_y)

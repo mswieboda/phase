@@ -8,7 +8,7 @@ module Phase
     getter star_bases : Array(StarBase)
     getter group_size : Int32
     getter enemy_group : EnemyGroup?
-    getter? dropped_off
+    getter drop_off_timer : Timer
 
     Sheet = "./assets/carrier.png"
     SpriteWidth = 384
@@ -18,10 +18,14 @@ module Phase
 
     # carrier drop off
     RotationSpeed = 33
-    DropOffDistanceThreshold = 10
-    DropOffMoveSpeed = 300
-    DroppedOffMoveSpeed = 777
-    DroppedOffTargetDistance = 9000
+    MoveSpeed = 300
+    DropOffDistanceThreshold = 3
+    FastRotateDistanceThreshold = 750
+    CloseRotationSpeed = 133
+    MaxMidDistance = 128
+    MinNewDropOffDistance = 300
+    MaxNewDropOffDistance = 500
+    DropOffWaitDuration = 3.seconds
 
     def initialize(x, y, target_x, target_y, star_bases, group_size = 3)
       super(x, y)
@@ -32,7 +36,7 @@ module Phase
       @star_bases = star_bases
       @group_size = group_size
       @enemy_group = nil
-      @dropped_off = false
+      @drop_off_timer = Timer.new(DropOffWaitDuration)
     end
 
     def self.sheet
@@ -58,37 +62,45 @@ module Phase
     def update(frame_time, bumpables : Array(HealthObj))
       super(frame_time, bumpables)
 
-      if distance(target_x, target_y).abs > DropOffDistanceThreshold
-        rotate_to_target(frame_time)
-        move_forward(move_speed * frame_time, bumpables)
-      elsif dropped_off?
-        @remove = true
+      distance = distance(target_x, target_y).abs
+
+      if distance > DropOffDistanceThreshold
+        rotation_speed = distance < FastRotateDistanceThreshold ? CloseRotationSpeed : RotationSpeed
+
+        rotate_to_target(rotation_speed * frame_time)
+        move_forward(MoveSpeed * frame_time, bumpables)
       elsif !facing?(drop_off_target_rotation)
         rotate_towards(drop_off_target_rotation, RotationSpeed * frame_time)
       else
-        drop_off_enemies
-      end
-    end
+        if drop_off_timer.done?
+          drop_off_enemies
 
-    def move_speed
-      dropped_off? ? DroppedOffMoveSpeed : DropOffMoveSpeed
+          drop_off_timer.stop
+        else
+          drop_off_timer.start unless drop_off_timer.started?
+        end
+      end
     end
 
     def drop_off_target_rotation
       initial_x <= x ? 0 : 180
     end
 
-    def rotate_to_target(frame_time)
+    def rotate_to_target(rotation_speed)
       target_rotation = rotation_to(target_x, target_y)
 
-      rotate_towards(target_rotation, RotationSpeed * frame_time) unless facing?(target_rotation)
+      rotate_towards(target_rotation, rotation_speed) unless facing?(target_rotation)
     end
 
     def drop_off_enemies
       enemies = [] of EnemyShip
 
-      mid_x = x
-      mid_y = y
+      # adds randomness to mid_x, mid_y
+      distance = rand(MaxMidDistance)
+      theta = rand(Math::PI / 180 * 360)
+      mid_x = x + distance * Math.cos(theta)
+      mid_y = y + distance * Math.sin(theta)
+
       angle = 360 / group_size
       init_angle = angle / 2
       distance = EnemyShip.hit_radius * 2.1
@@ -111,6 +123,15 @@ module Phase
       dy = speed * Math.sin(theta)
 
       move(dx, dy)
+
+      bumpables.each do |bumpable|
+        next if bumpable.is_a?(Enemy)
+
+        if hit?(bumpable.hit_circle)
+          move(-dx, -dy)
+          bumpable.bump(dx, dy, self, bumpables)
+        end
+      end
     end
 
     def bump(dx, dy, bumped_by, bumpables)
@@ -119,9 +140,14 @@ module Phase
 
     def finish_drop_off
       @enemy_group = nil
-      @dropped_off = true
-      @target_x = x + (initial_x <= x ? DroppedOffTargetDistance : -DroppedOffTargetDistance)
-      @target_y = y
+      @initial_x = x
+
+      # new drop off position
+      distance = rand(MaxNewDropOffDistance) + MinNewDropOffDistance
+      theta = rand(Math::PI / 180 * 360)
+
+      @target_x = x + distance * Math.cos(theta)
+      @target_y = y + distance * Math.sin(theta)
     end
   end
 end
